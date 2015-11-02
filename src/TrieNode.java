@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class TrieNode {
@@ -32,15 +33,6 @@ public class TrieNode {
 
 		
 
-		public int min(int i, Object v) {
-			if (v == null)
-				return i;
-			int vv = (Integer) v;
-			if (vv > i)
-				return i;
-			return vv;
-		}
-		
 	
 		private Map<TrieNode, Integer> getDescendant(Map<TrieNode, Integer> descendents,
 				int depth, int k) {
@@ -66,7 +58,8 @@ public class TrieNode {
 				if (p.depth < depth) {
 					for (TrieNode c : p.n.children.values()) {
 						Object v = descendents.get(c);
-						int vv = min(p.depth + 1, v);
+						int vv = p.depth + 1;
+						 if( v!=null && (Integer)v<vv)vv=(Integer)v;
 						if (vv <= depth) {
 							descendents.put(c, vv);
 							queue.add(new pair(c, vv));
@@ -81,7 +74,11 @@ public class TrieNode {
 		@Override
 		public String toString() {
 
-			return "TrieNode [id=" + id + "]";
+			String s= "TrieNode id=" + id + " :P "+prob+" L "+maxlen+"\n" ;
+			for(Entry<Character, TrieNode> child:children.entrySet()){
+				s=s+child.getKey()+ "\t"+child.getValue();
+			}
+			return s;
 		}
 	}
 

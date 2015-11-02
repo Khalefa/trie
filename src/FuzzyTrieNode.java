@@ -38,8 +38,10 @@ public class FuzzyTrieNode extends TrieNode {
 			// add children to the queue
 			if (p.depth < depth) {
 				for (TrieNode c : p.n.children.values()) {
-					Object v = descendents.get(c);
-					int vv = min(p.depth + 1, v);
+					ProbED v = descendents.get(c);
+					
+					int vv = p.depth + 1;
+					if( v!=null && v.tau < vv)vv= v.tau;
 					if (vv <= depth) {
 						descendents.put(c, new ProbED(vv));
 						queue.add(new pair(c, vv));

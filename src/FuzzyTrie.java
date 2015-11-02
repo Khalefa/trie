@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
@@ -14,20 +15,23 @@ import java.util.Vector;
 
 public class FuzzyTrie extends Trie {
 	
-	private  TrieNode insertString(TrieNode root, String s) {
-
+	private  TrieNode insertString(TrieNode root, String s, float prob) {
+		int len=s.length();
 		TrieNode v = root;
-
+		if(v.prob<prob)v.prob=prob;
+		if(v.maxlen<len)v.maxlen=len;
 		TrieNode next = v;
 		for (char ch : s.toCharArray()) {
 			next = v.children.get(ch);
 
 			if (next == null)
 				v.children.put(ch, next = new FuzzyTrieNode(v, ch));
-
+			if(v.prob<prob)v.prob=prob;
+			if(v.maxlen<len)v.maxlen=len;
 			v = next;
 		}
-
+		if(v.prob<prob)v.prob=prob;
+		if(v.maxlen<len)v.maxlen=len;
 		v.leaf = true;
 		return v;
 	}
@@ -44,7 +48,12 @@ public class FuzzyTrie extends Trie {
 				if (line == null || line.equals(""))
 					break;
 
-				insertString(root, line);
+				String[] inputS=line.split(",");
+				float prob=1;
+				if(inputS.length >1){
+					prob=Float.parseFloat(inputS[1]);
+				}
+				insertString(root, inputS[0],prob);
 
 			}
 		} catch (Exception e) {
@@ -87,10 +96,18 @@ public class FuzzyTrie extends Trie {
 					FuzzyTrieNode child=(FuzzyTrieNode)node;
 				// insertion
 				if (child.fromParent == ch) {// we have a match
-					child.getDescendant(curactiveNodes, depth, l.tau);
+					Map<TrieNode, ProbED> tmp_activenodes=new HashMap<TrieNode,ProbED>();
+					child.getDescendant(tmp_activenodes, depth, l.tau);
+					for(Entry<TrieNode, ProbED> entry:tmp_activenodes.entrySet()){
+						TrieNode key=entry.getKey();
+						ProbED val=entry.getValue();
+						ProbED p=new ProbED(val.tau,key.prob,key.maxlen );
+						curactiveNodes.put(key,p);
+					}
 				} else if (l.tau <= depth) {
-
-					int m = child.min(l.tau + 1, curactiveNodes.get(child));
+					ProbED p= curactiveNodes.get(child);
+					int m = l.tau + 1;
+					if (p!=null && p.tau < m)m =p.tau;
 					if (m <= depth)
 						curactiveNodes.put(child,new ProbED( m,child.prob,child.maxlen));
 				}
@@ -102,18 +119,18 @@ public class FuzzyTrie extends Trie {
 	}
 
 	// Entry point for matching
-	public  Set<String> GetSimilarStrings(String s, int k) {
-		Set<String> similarWords = new HashSet<String>();
-		for (int tau = 0; tau <= 10; tau++) {
+	public  Map<String,ProbED> GetSimilarStrings(String s, int k) {
+		Map <String,ProbED> similarWords = new HashMap<String,ProbED>();
+		for (int tau = 1; tau <= 10; tau++) {
 
-			similarWords.addAll(matchString(root, s, tau));
+			similarWords.putAll(matchString(root, s, tau));
 			if (similarWords.size() >= k)
 				break;
 		}
 		return similarWords;
 	}
 
-	private static List<String> matchString(TrieNode root, String s, int depth) {
+	private static Map<String,ProbED> matchString(TrieNode root, String s, int depth) {
 		FuzzyTrieNode f=(FuzzyTrieNode)root;
 		buildRootActiveNodes(root, f.activeNodes, 0, depth);
 
@@ -170,17 +187,19 @@ public class FuzzyTrie extends Trie {
 
 		String sim = null;
 		
-		List<String> similarWords = new Vector<String>();
+		Map<String,ProbED> similarWords = new HashMap<String,ProbED>();
 		for (TrieNode t : activenodes.keySet()) {
+			
 			if (t.leaf == true) {
+				TrieNode leaf=t;
 				sim = "";
 				while (t.id != 0) {
 					char c = t.fromParent;
 					sim = c + sim;
 					t = t.parent;
 				}
-
-				similarWords.add(sim);
+				ProbED p=activenodes.get(leaf);
+				similarWords.put(sim,p);
 				
 			}
 		}

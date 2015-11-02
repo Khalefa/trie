@@ -1,0 +1,7 @@
+data bases,0
+li,0.2
+lin,0.4
+liu,0.7
+lu,0.2
+luis,0.8
+vldb,0
