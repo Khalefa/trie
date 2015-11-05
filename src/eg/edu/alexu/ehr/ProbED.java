@@ -30,11 +30,11 @@ void CalcProbED(int tau, float prob, int l){
 @Override
 public double GetDistance() {
 	// TODO Auto-generated method stub
-	return prob;
+	return tau;
 }
 @Override
 public double GetLimit() {
 	// TODO Auto-generated method stub
-	return 0;
+	return prob;
 }
 }
