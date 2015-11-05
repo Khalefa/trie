@@ -24,6 +24,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import eg.edu.alexu.ehr.FuzzyTrie;
+import eg.edu.alexu.ehr.ProbED;
+
 /**
  * @author David
  */
@@ -54,8 +57,8 @@ public class Test {
      static FuzzyTrie t;
      static void printSimilarString(String s, int k, float m_tau){
     	System.out.println("Getting "+k+" string similar to "+s);
-    	Map<String, ProbED> sim=t.GetSimilarStrings(s, k);
-    	 for(Map.Entry<String, ProbED> ss : sim.entrySet()){
+    	Map<String, Double> sim=t.GetSimilarStrings(s, k);
+    	 for(Map.Entry<String, Double> ss : sim.entrySet()){
     		 System.out.println("\t**"+ss.getKey()+":"+ss.getValue());
     	 }
      }

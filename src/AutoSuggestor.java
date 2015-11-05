@@ -22,6 +22,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import eg.edu.alexu.ehr.FuzzyTrie;
+import eg.edu.alexu.ehr.ProbED;
+
 class AutoSuggestor {
 
 	private final JTextField textField;
@@ -185,7 +188,7 @@ class AutoSuggestor {
 		 * (Exception e) { // TODO Auto-generated catch block
 		 * e.printStackTrace(); }
 		 */
-		Map<String,ProbED> M = trie.GetSimilarStrings(typedWord, 10);
+		Map<String,Double> M = trie.GetSimilarStrings(typedWord, 10);
 	
 
 		List<String> list = new ArrayList<String>();
