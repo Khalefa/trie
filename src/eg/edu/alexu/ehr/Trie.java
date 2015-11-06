@@ -1,4 +1,5 @@
 package eg.edu.alexu.ehr;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,14 +8,23 @@ import java.io.InputStreamReader;
 public class Trie {
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		String s = "";
-		s += root.toString();
-
+		s += root.toString(0);
 		return s;
 	}
 
-	private  TrieNode insertString(TrieNode root, String s, float prob) {
+	public TrieNode exactSearch(String s) {
+		TrieNode cur = root;
+		for (char ch : s.toCharArray()) {
+			TrieNode next = cur.children.get(ch);
+			if (next == null)
+				return cur;
+			cur = next;
+		}
+		return cur;
+	}
+
+	TrieNode insertString(TrieNode root, String s, float prob) {
 		int len = s.length();
 		TrieNode v = root;
 		if (v.prob < prob)
@@ -41,12 +51,12 @@ public class Trie {
 		return v;
 	}
 
-	 TrieNode CreateTrieNode(TrieNode v, char ch) {
+	TrieNode CreateTrieNode(TrieNode v, char ch) {
 		return TrieNodeFactory.createTrieNode(v, ch, 0);
 	}
 
 	public void Init(String fileName) {
-		
+
 		root = CreateTrieNode(null, '\0');
 		try {
 			File file = new File(fileName);
@@ -63,14 +73,12 @@ public class Trie {
 					prob = Float.parseFloat(inputS[1]);
 				}
 				insertString(root, inputS[0], prob);
-
 			}
 			in.close();
 		} catch (Exception e) {
 
 			root = null;
 		}
-		
 
 	}
 

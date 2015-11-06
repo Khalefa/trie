@@ -6,6 +6,15 @@ public float prob;
 public int length;
 float val;
 
+public ProbED add(ProbED d){
+ProbED p=new ProbED();
+p.tau=d.tau+tau;
+p.val=d.val;
+return p;
+}
+private ProbED(){
+
+}
 public ProbED(int tau, float prob, int maxlen) {
 	this.tau=tau;
 	CalcProbED(tau, prob,maxlen);
@@ -36,5 +45,13 @@ public double GetDistance() {
 public double GetLimit() {
 	// TODO Auto-generated method stub
 	return prob;
+}
+@Override
+public IDistanceMetric add(int i) {
+	ProbED d=new ProbED();
+	d.tau=tau+i;
+	d.prob=prob;
+	d.val=val+i;
+	return d;
 }
 }

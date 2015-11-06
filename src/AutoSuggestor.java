@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -23,7 +22,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import eg.edu.alexu.ehr.FuzzyTrie;
-import eg.edu.alexu.ehr.ProbED;
 
 class AutoSuggestor {
 

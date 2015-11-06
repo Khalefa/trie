@@ -1,12 +1,13 @@
 package eg.edu.alexu.ehr;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class TrieNode {
-	
+
 	static int counter = 0;
 	int id;
 	Map<Character, TrieNode> children = new TreeMap<Character, TrieNode>();
@@ -15,6 +16,10 @@ public class TrieNode {
 	char fromParent;
 	float prob;
 	public int maxlen;
+
+	public int getID() {
+		return id;
+	}
 
 	public TrieNode(TrieNode p, char x) {
 		this.id = counter;
@@ -25,11 +30,11 @@ public class TrieNode {
 	}
 
 	public TrieNode(TrieNode p, char x, float prb) {
-		this(p,x);
+		this(p, x);
 		this.prob = prb;
 	}
 
-	@SuppressWarnings("unused") Map<TrieNode, IDistanceMetric> getDescendant(Map<TrieNode,IDistanceMetric> descendents, int depth, int k) {
+	Map<TrieNode, IDistanceMetric> getDescendant(Map<TrieNode, IDistanceMetric> descendents, int depth, int k) {
 		class pair {
 			public TrieNode n;
 			public int depth;
@@ -41,7 +46,7 @@ public class TrieNode {
 		}
 
 		ArrayList<pair> queue = new ArrayList<pair>();
-		queue.add(new pair(this,k));
+		queue.add(new pair(this, k));
 		if (k > depth)
 			return descendents;
 		descendents.put(this, new ED(k));
@@ -65,12 +70,44 @@ public class TrieNode {
 		return descendents;
 	}
 
+	public Map<TrieNode, IDistanceMetric> getLeafs(IDistanceMetric dist) {
+		class pair {
+			public TrieNode n;
+			public int depth;
+
+			public pair(TrieNode n, int depth) {
+				this.n = n;
+				this.depth = depth;
+			}
+		}
+		Map<TrieNode, IDistanceMetric> leafs = new HashMap<TrieNode, IDistanceMetric>();
+		ArrayList<pair> queue = new ArrayList<pair>();
+		queue.add(new pair(this, 0));
+		if (leaf)
+			leafs.put(this, dist);
+		while (!queue.isEmpty()) {
+			pair p = queue.remove(0);
+			for (TrieNode c : p.n.children.values()) {
+				if (c.leaf)
+					leafs.put(c, dist.add(p.depth + 1));
+				queue.add(new pair(c, p.depth + 1));
+			}
+		}
+		return leafs;
+	}
+
 	@Override
 	public String toString() {
+		return "TrieNode id=" + id + ":P " + prob + " L:" + maxlen ;
+	}
 
-		String s = "TrieNode id=" + id + " :P " + prob + " L " + maxlen + "\n";
+	public String toString(int l) {
+		String s = this.toString();
+		String tabs = "";
+		for (int k = 0; k < l; k++)
+			tabs = tabs + "\t";
 		for (Entry<Character, TrieNode> child : children.entrySet()) {
-			s = s + child.getKey() + "\t" + child.getValue();
+			s = s + tabs + child.getKey() + "\t" + child.getValue().toString(l + 1);
 		}
 		return s;
 	}
