@@ -64,9 +64,7 @@ public class FuzzyTrie extends Trie {
 
 	// Entry point for matching
 	public Map<String, Double> GetSimilarStrings(String s, int k) {
-		Map<String, Double> similarWords = new HashMap<String, Double>();
-			similarWords.putAll(matchString(root, s, k));
-		return similarWords;
+		return matchString(root, s, k);
 	}
 
 	private static Map<String, Double> matchString(TrieNode trie, String s, int depth) {

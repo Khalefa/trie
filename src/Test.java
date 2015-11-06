@@ -52,7 +52,9 @@ public class Test {
 
 	public static void main(String[] args) {
 		t = new FuzzyTrie();
+		long startTime = System.nanoTime();
 		t.Init("c:\\data\\author.data");
+		long endTime = System.nanoTime();
 		//System.out.println(t);
 		/*
 		  SwingUtilities.invokeLater(new Runnable() {
@@ -63,9 +65,16 @@ public class Test {
 		for (Entry<TrieNode, IDistanceMetric> e : m.entrySet()) {
 			System.out.println("*" + e.getKey().getID() + "," + e.getValue().GetDistance());
 		}
-		printSimilarString("li", 2);
+		
 
-		printSimilarString("nliu", 3);
+		long duration = (endTime - startTime);
+		System.out.println("build time "+duration/1000000.0 );
+		startTime = System.nanoTime();
+		printSimilarString("li", 2);
+		endTime = System.nanoTime();
+		duration=endTime-startTime;
+		System.out.println("access time "+duration/1000000.0);
+		//printSimilarString("nliu", 3);
 	}
 
 }
