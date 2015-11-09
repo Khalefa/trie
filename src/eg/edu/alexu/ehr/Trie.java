@@ -1,11 +1,17 @@
 package eg.edu.alexu.ehr;
 
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
 public class Trie {
+	static int string_id=0;
+	boolean looked = false;
+	Map<Integer, String> dictionary = new HashMap<Integer, String>();
+	TrieNode root=null;
 	@Override
 	public String toString() {
 		String s = "";
@@ -25,6 +31,9 @@ public class Trie {
 	}
 
 	TrieNode insertString(TrieNode root, String s, float prob) {
+		if (looked)
+			return null;
+
 		int len = s.length();
 		TrieNode v = root;
 		if (v.prob < prob)
@@ -55,10 +64,9 @@ public class Trie {
 		return TrieNodeFactory.createTrieNode(v, ch, 0);
 	}
 
-	public void Init(String fileName) {
-
-		root = CreateTrieNode(null, '\0');
+	private List<String> readandsortFile(String fileName) {
 		try {
+			List<String> lines = new Vector<String>();
 			File file = new File(fileName);
 			FileInputStream fIn = new FileInputStream(file);
 			BufferedReader in = new BufferedReader(new InputStreamReader(fIn));
@@ -67,21 +75,61 @@ public class Trie {
 				String line = in.readLine();
 				if (line == null || line.equals(""))
 					break;
+				lines.add(line);
+			}
+			in.close();
+			Collections.sort(lines);
+			return lines;
+		} catch (Exception e) {
+
+		}
+		return null;
+	}
+
+	private void Init(String fileName) {
+		LinkedBlockingQueue<TrieNode> leafs=new LinkedBlockingQueue<TrieNode>();
+ 		root = CreateTrieNode(null, '\0');
+		try {
+			
+			List<String> lines=readandsortFile(fileName);
+			for(String line :lines){ 
+				
 				String[] inputS = line.split(",");
 				float prob = 1;
 				if (inputS.length > 1) {
 					prob = Float.parseFloat(inputS[1]);
 				}
-				insertString(root, inputS[0], prob);
+				TrieNode leaf=insertString(root, inputS[0], prob);
+				leaf.setRange(new Range(string_id,string_id));
+				leafs.put(leaf);
+				dictionary.put(string_id++, inputS[0]);
 			}
-			in.close();
+			
 		} catch (Exception e) {
 
 			root = null;
 		}
+	    while(!leafs.isEmpty()){
+	    	try{
+	    	TrieNode l=leafs.take();
+	  	    
+	    	Range r=l.getRange();
+	    	if(l.parent!=null){	    	
+	    		l.parent.updateRange(r);
+	    		leafs.put(l.parent);
+	    	}
+	    	}catch(Exception e){
+	    		
+	    	}
+	    }
+		looked = true;
 
 	}
 
-	TrieNode root;
+	public Trie(String filename) {
+		Init(filename);
+	}
+
+	
 
 }

@@ -16,11 +16,22 @@ public class TrieNode {
 	char fromParent;
 	float prob;
 	public int maxlen;
-
+    Range r;
 	public int getID() {
 		return id;
 	}
-
+	public void setRange(Range range){
+		r=range;
+	}
+	public Range getRange(){
+		return r;
+	}
+	public void updateRange(Range range){
+		if(this.r==null)
+			this.r=new Range(range);
+		else 
+			this.r=this.r.addRange(range);
+	}
 	public TrieNode(TrieNode p, char x) {
 		this.id = counter;
 		counter++;
@@ -98,7 +109,7 @@ public class TrieNode {
 
 	@Override
 	public String toString() {
-		return "TrieNode id=" + id + ":P " + prob + " L:" + maxlen ;
+		return "TrieNode id=" + id + ":P " + prob + " L:" + maxlen+ " "+ r ;
 	}
 
 	public String toString(int l) {

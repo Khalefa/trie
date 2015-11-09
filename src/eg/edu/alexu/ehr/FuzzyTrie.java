@@ -6,14 +6,16 @@ import java.util.Map.Entry;
 
 public class FuzzyTrie extends Trie {
 
+	public FuzzyTrie(String filename) {
+		super(filename);		
+	}
+
+
 	TrieNode CreateTrieNode(TrieNode v, char ch) {
 		return TrieNodeFactory.createTrieNode(v, ch, 1);
 	}
 
-	public FuzzyTrie() {
-		
-	}
-
+	
 	static void buildRootActiveNodes(TrieNode node, Map<TrieNode, IDistanceMetric> activeNodes, int depth, int limit) {
 		if (depth > limit)
 			return;
