@@ -61,4 +61,12 @@ public class ProbED implements IDistanceMetric {
 		d.CalcProbED();
 		return d;
 	}
+
+	@Override
+	public int compareTo(IDistanceMetric o) {
+		if(o instanceof ProbED)
+			return Float.compare(this.val,(int) o.GetLimit());
+			else 
+				return 0;
+	}
 }

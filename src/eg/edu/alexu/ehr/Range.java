@@ -65,7 +65,10 @@ public class Range implements Comparator<Range>, Comparable<Range> {
 			return true;
 		return false;
 	}
-
+    public boolean covers(Range r){
+    	if(this.min<=r.min && this.max>=r.max) return true;
+    	return false;
+    }
 	public int compareTo(Range o) {
 		if (o.min == min) {
 			return Integer.compare(max, o.max);
@@ -73,36 +76,24 @@ public class Range implements Comparator<Range>, Comparable<Range> {
 		return Integer.compare(min, o.min);
 	}
 
-	public static List<Range> combineRanges(List<Range> ranges) {
-		try {
-			PriorityBlockingQueue<Range> q = new PriorityBlockingQueue<Range>();
-			List<Range> output_ranges = new Vector<Range>();
-
-			for (Range g : ranges)
-				q.put(g);
-			while (q.size() >= 2) {
-				Range r1 = q.take();
-				Range r2 = q.take();
-				if (r1.touches(r2) || r1.intersects(r2)) {
-					Range r = new Range(r1, r2);
-					q.put(r);
-				} else {
-					output_ranges.add(r1);
-					q.put(r2);
-				}
-			}
-			if (q.size() == 1) {
-				output_ranges.add(q.take());
-			}
-			return output_ranges;
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
+	
 	@Override
 	public int compare(Range r1, Range r2) {
 		return r1.compareTo(r2);
+	}
+
+	public void setMax(int len) {
+		this.max=len;		
+	}
+	public void setMin(int len) {
+		this.min=len;		
+	}
+
+	public void include(int len) {
+	if(len<min)
+		min=len;
+	if(len>max)
+		max=len;
 	}
 
 }

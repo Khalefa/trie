@@ -46,54 +46,58 @@ public class Test {
 		frame.setVisible(true);
 	}
 
-	static FuzzyTrie t;
+	static TopKTrie t;
 
-	static void printSimilarString(String s, int k) {
-		System.out.println("Getting  string similar to " + s);
-		Map<String, Double> sim = t.GetSimilarStrings(s, k);
-		try {
-			PrintWriter w = new PrintWriter("c:\\data\\o.txt", "UTF-8");
-			for (Map.Entry<String, Double> ss : sim.entrySet()) {
-				w.println("" + ss.getKey() + "\t" + ss.getValue());
-			}
-			w.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+//	static void printSimilarString(String s, int k) {
+//		System.out.println("Getting  string similar to " + s);
+//		Map<String, Double> sim = t.GetSimilarStrings(s, k);
+//		try {
+//			PrintWriter w = new PrintWriter("c:\\data\\o.txt", "UTF-8");
+//			for (Map.Entry<String, Double> ss : sim.entrySet()) {
+//				w.println("" + ss.getKey() + "\t" + ss.getValue());
+//			}
+//			w.close();
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 	
 
-	public static void testRanges() {
-		List<Range> ranges = new Vector<Range>();
-		ranges.add(new Range(1, 3));
-		ranges.add(new Range(2, 3));
-		ranges.add(new Range(0, 3));
-		ranges.add(new Range(1, 4));
-		ranges.add(new Range(5, 6));
-		ranges.add(new Range(10, 13));
-		ranges.add(new Range(11, 13));
-		ranges.add(new Range(1, 3));
-		ranges.add(new Range(100, 300));
-	
-		for (Range r : ranges) {
-			System.out.println(r);
-		}
-		
-		List<Range> ranges_combined=Range.combineRanges(ranges);
-		for (Range r : ranges_combined) {
-			System.out.println("* "+ r);
-		}
-	}
-
+//	public static void testRanges() {
+//		List<Range> ranges = new Vector<Range>();
+//		ranges.add(new Range(1, 3));
+//		ranges.add(new Range(2, 3));
+//		ranges.add(new Range(0, 3));
+//		ranges.add(new Range(1, 4));
+//		ranges.add(new Range(5, 6));
+//		ranges.add(new Range(10, 13));
+//		ranges.add(new Range(11, 13));
+//		ranges.add(new Range(1, 3));
+//		ranges.add(new Range(100, 300));
+//	
+//		for (Range r : ranges) {
+//			System.out.println(r);
+//		}
+//		
+//		List<Range> ranges_combined=Range.combineRanges(ranges);
+//		for (Range r : ranges_combined) {
+//			System.out.println("* "+ r);
+//		}
+//	}
+public  static void testTopk(){
+	t = new TopKTrie("c:\\data\\test.data");
+	System.out.println(t);
+	t.matchPrefix("ab",2);
+}
 	public static void main(String[] args) {
-
-		testRanges();
+testTopk();
+		//testRanges();
 		// long startTime = System.nanoTime();
 		// t = new FuzzyTrie("c:\\data\\author.data");
 		// // System.out.println(t);

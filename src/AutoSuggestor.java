@@ -186,7 +186,7 @@ class AutoSuggestor {
 		 * (Exception e) { // TODO Auto-generated catch block
 		 * e.printStackTrace(); }
 		 */
-		Map<String,Double> M = trie.GetSimilarStrings(typedWord, 10);
+		Map<String,Double> M = null;//trie.GetSimilarStrings(typedWord, 10);
 	
 
 		List<String> list = new ArrayList<String>();

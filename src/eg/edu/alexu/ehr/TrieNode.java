@@ -15,28 +15,29 @@ public class TrieNode {
 	TrieNode parent;
 	char fromParent;
 	float prob;
-	public int maxlen;
-    Range r;
+
+    Range rID;
+    Range rLength;
 	public int getID() {
 		return id;
 	}
+	//TODO:REFACTOR RANGE
 	public void setRange(Range range){
-		r=range;
+		rID=range;
 	}
 	public Range getRange(){
-		return r;
+		return rID;
 	}
 	public void updateRange(Range range){
-		if(this.r==null)
-			this.r=new Range(range);
+		if(this.rID==null)
+			this.rID=new Range(range);
 		else 
-			this.r=this.r.addRange(range);
+			this.rID=this.rID.addRange(range);
 	}
 	public TrieNode(TrieNode p, char x) {
 		this.id = counter;
 		counter++;
 		parent = p;
-
 		fromParent = x;// holding current node character
 	}
 
@@ -109,7 +110,7 @@ public class TrieNode {
 
 	@Override
 	public String toString() {
-		return "TrieNode id=" + id + ":P " + prob + " L:" + maxlen+ " "+ r ;
+		return "TrieNode id=" + id + ":P " + prob + " L:" + rLength+ " "+ rID ;
 	}
 
 	public String toString(int l) {
