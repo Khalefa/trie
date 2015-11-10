@@ -3,5 +3,5 @@ package eg.edu.alexu.ehr;
 public interface IDistanceMetric extends Comparable<IDistanceMetric> {
 double GetLimit();
 double GetDistance();
-IDistanceMetric add(int i);
+//IDistanceMetric add(int i);
 }

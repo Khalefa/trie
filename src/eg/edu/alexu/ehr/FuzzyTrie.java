@@ -13,7 +13,14 @@ public class FuzzyTrie extends Trie {
 	TrieNode CreateTrieNode(TrieNode v, char ch) {
 		return TrieNodeFactory.createTrieNode(v, ch, 1);
 	}
-
+	private void printActiveNode(Map<TrieNode, IDistanceMetric> activeNodes) {
+		String s="";
+		for(Entry<TrieNode, IDistanceMetric> entry: activeNodes.entrySet()){
+			s=s+"("+entry.getKey().id+ ","+entry.getValue().GetDistance()+")";
+		}
+		s=s+"\n";
+		System.out.println(s);
+	}
 	
 	 void buildRootActiveNodes(TrieNode node, Map<TrieNode, IDistanceMetric> activeNodes, int depth, int limit) {
 		if (depth > limit)
@@ -26,6 +33,8 @@ public class FuzzyTrie extends Trie {
 		}
 	}
 
+	
+	 
 	  Map<TrieNode, IDistanceMetric> IncrementalBuildActiveNode(char ch,
 			Map<TrieNode, IDistanceMetric> cparentActiveNodes, int depth) {
 		Map<TrieNode, IDistanceMetric> curactiveNodes = new HashMap<TrieNode, IDistanceMetric>();
@@ -42,14 +51,7 @@ public class FuzzyTrie extends Trie {
 				FuzzyTrieNode child = (FuzzyTrieNode) node;
 				// insertion
 				if (child.fromParent == ch) {// we have a match
-					Map<TrieNode, IDistanceMetric> tmp_activenodes = new HashMap<TrieNode, IDistanceMetric>();
-					child.getDescendant(tmp_activenodes, depth, (int) l.GetDistance());
-					for (Entry<TrieNode, IDistanceMetric> entry : tmp_activenodes.entrySet()) {
-						TrieNode key = entry.getKey();
-						IDistanceMetric val = entry.getValue();
-						ProbED p = new ProbED((int) val.GetDistance(), key.prob, key.rLength.getMax());
-						curactiveNodes.put(key, p);
-					}
+					child.getDescendant(curactiveNodes, depth, (int) l.GetDistance());
 				} else if (l.GetDistance() <= depth) {
 					IDistanceMetric p = curactiveNodes.get(child);
 					int m = (int) l.GetDistance() + 1;
@@ -69,9 +71,12 @@ public class FuzzyTrie extends Trie {
 		int tau=prefix.length();
 		Map<TrieNode, IDistanceMetric> activenodes =new HashMap<>();
 		buildRootActiveNodes(r, activenodes, 0, tau);
-	
+	//	System.out.print("Active nodes");
+	//	System.out.println(r); printActiveNode(activenodes);
 		for (char ch : prefix.toCharArray()) {
 			activenodes = IncrementalBuildActiveNode(ch, activenodes, tau);
+	//		System.out.print("Active nodes  ");
+		//	printActiveNode(activenodes);
 		}
 		for (Entry<TrieNode,IDistanceMetric> e : activenodes.entrySet()) {
 			nodes.add(new TrieNodewithDistance(e.getKey(), e.getValue()));

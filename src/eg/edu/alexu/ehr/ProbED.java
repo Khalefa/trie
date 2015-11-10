@@ -52,15 +52,15 @@ public class ProbED implements IDistanceMetric {
 		return val;
 	}
 
-	@Override
-	public IDistanceMetric add(int i) {
-		ProbED d = new ProbED();
-		d.tau = tau + i;
-		d.length=length;
-		d.prob = prob;
-		d.CalcProbED();
-		return d;
-	}
+//	@Override
+//	public IDistanceMetric add(int i) {
+//		ProbED d = new ProbED();
+//		d.tau = tau + i;
+//		d.length=length;
+//		d.prob = prob;
+//		d.CalcProbED();
+//		return d;
+//	}
 
 	@Override
 	public int compareTo(IDistanceMetric o) {

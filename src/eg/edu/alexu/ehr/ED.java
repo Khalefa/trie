@@ -20,11 +20,11 @@ public double GetLimit() {
 	// TODO Auto-generated method stub
 	return distance;
 }
-@Override
-public IDistanceMetric add(int i) {
-	// TODO Auto-generated method stub
-	return new ED(distance+i);
-}
+//@Override
+//public IDistanceMetric add(int i) {
+//	// TODO Auto-generated method stub
+//	return new ED(distance+i);
+//}
 @Override
 public int compareTo(IDistanceMetric o) {
 	if(o instanceof ED)

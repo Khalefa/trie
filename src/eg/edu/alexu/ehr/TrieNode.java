@@ -61,19 +61,19 @@ public class TrieNode {
 		queue.add(new pair(this, k));
 		if (k > depth)
 			return descendents;
+		
 		descendents.put(this, new ED(k));
+	
 		while (!queue.isEmpty()) {
 			// get the first node of the queue
 			pair p = queue.remove(0);
 			// add children to the queue
 			if (p.depth < depth) {
 				for (TrieNode c : p.n.children.values()) {
-					Object v = descendents.get(c);
-					int vv = p.depth + 1;
-					if (v != null && (Integer) v < vv)
-						vv = (Integer) v;
-					if (vv <= depth) {
-						descendents.put(c, new ED(vv));
+					IDistanceMetric v = descendents.get(c);
+					int vv = p.depth + 1; 					
+					if (vv <= depth) {							
+						Util.AddActiveNode(descendents, c, new ED(p.depth + 1));
 						queue.add(new pair(c, vv));
 					}
 				}
@@ -101,7 +101,7 @@ public class TrieNode {
 			pair p = queue.remove(0);
 			for (TrieNode c : p.n.children.values()) {
 				if (c.leaf)
-					leafs.put(c, dist.add(p.depth + 1));
+					leafs.put(c,  new ED(p.depth + 1+(int)dist.GetDistance()));
 				queue.add(new pair(c, p.depth + 1));
 			}
 		}
@@ -121,6 +121,6 @@ public class TrieNode {
 		for (Entry<Character, TrieNode> child : children.entrySet()) {
 			s = s + tabs + child.getKey() + "\t" + child.getValue().toString(l + 1);
 		}
-		return s;
+		return s+"";
 	}
 }

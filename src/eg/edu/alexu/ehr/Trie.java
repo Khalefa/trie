@@ -33,7 +33,7 @@ public class Trie {
 		}
 		return cur;
 	}
-
+	
 	TrieNode insertString(TrieNode root, String s, float prob) {
 		if (looked)
 			return null;
