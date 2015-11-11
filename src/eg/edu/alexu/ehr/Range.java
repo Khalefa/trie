@@ -89,7 +89,7 @@ public class Range implements Comparator<Range>, Comparable<Range> {
 		this.min=len;		
 	}
 
-	public void include(int len) {
+	public void extend(int len) {
 	if(len<min)
 		min=len;
 	if(len>max)

@@ -14,27 +14,28 @@ public class TrieNode {
 	boolean leaf;
 	TrieNode parent;
 	char fromParent;
-	float prob;
 
+	float prob;
     Range rID;
     Range rLength;
+    
 	public int getID() {
 		return id;
 	}
-	//TODO:REFACTOR RANGE
-	public void setRange(Range range){
-		rID=range;
+	
+	 void adjustTrieNode(int id, int len,float prob){
+		if(rID==null)
+			rID=new Range(id,id);
+		else rID.extend(id);
+		if(rLength==null)
+			rLength=new Range(len,len);
+		else rLength.extend(len);
+		if(prob>this.prob)
+			this.prob=prob;
+		
 	}
-	public Range getRange(){
-		return rID;
-	}
-	public void updateRange(Range range){
-		if(this.rID==null)
-			this.rID=new Range(range);
-		else 
-			this.rID=this.rID.addRange(range);
-	}
-	public TrieNode(TrieNode p, char x) {
+
+public TrieNode(TrieNode p, char x) {
 		this.id = counter;
 		counter++;
 		parent = p;

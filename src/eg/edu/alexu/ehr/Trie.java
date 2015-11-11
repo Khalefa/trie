@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 
 public class Trie {
 
-	static int string_id = 0;
 	boolean looked = false;
 	Map<Integer, String> dictionary = new HashMap<Integer, String>();
 	List<Integer> sorted_id = null;
@@ -33,75 +32,54 @@ public class Trie {
 		}
 		return cur;
 	}
-	
-	TrieNode insertString(TrieNode root, String s, float prob) {
+
+	TrieNode insertString(TrieNode root, String s, int id, float prob) {
 		if (looked)
 			return null;
-
-		int len = s.length();
 		TrieNode v = root;
-		if (v.prob < prob)
-			v.prob = prob;
-		if (v.rLength == null)
-			v.rLength = new Range(len, len);
-		else
-			v.rLength.include(len);
-
+		int len = s.length();
+		v.adjustTrieNode(id, len, prob);
 		TrieNode next = v;
 		for (char ch : s.toCharArray()) {
 			next = v.children.get(ch);
 			if (next == null)
 				v.children.put(ch, next = CreateTrieNode(v, ch));
-			if (v.prob < prob)
-				v.prob = prob;
-			if (v.rLength == null)
-				v.rLength = new Range(len, len);
-			else
-				v.rLength.include(len);
+			next.adjustTrieNode(id, len, prob);
 			v = next;
 		}
-		// just in case
-		if (v.prob < prob)
-			v.prob = prob;
-		if (v.rLength == null)
-			v.rLength = new Range(len, len);
-		else
-			v.rLength.include(len);
+		v.adjustTrieNode(id, len, prob);
 		v.leaf = true;
 		return v;
 	}
 
 	TrieNode CreateTrieNode(TrieNode v, char ch) {
-		return TrieNodeFactory.createTrieNode(v, ch, 0);
+		TrieNode n = TrieNodeFactory.createTrieNode(v, ch, 0);
+
+		return n;
 	}
+	class pair implements Comparable<pair> {
+		int id;
+		String s;
 
-	private void sortbyLength() {
-		class pair implements Comparable<pair> {
-			int id;
-			String s;
-
-			pair(int id, String s) {
-				this.id = id;
-				this.s = s;
-			}
-
-			@Override
-			public int compareTo(pair o) {
-				if (s.length() == o.s.length())
-					return s.compareTo(o.s);
-				return Integer.compare(s.length(), o.s.length());
-			}
-
-			public Integer getId() {
-				return id;
-			}
+		pair(int id, String s) {
+			this.id = id;
+			this.s = s;
 		}
-		List<pair> pairs = new Vector<>(dictionary.size());
-		for (Entry<Integer, String> e : dictionary.entrySet()) {
-			pairs.add(new pair(e.getKey(), e.getValue()));
+
+		@Override
+		public int compareTo(pair o) {
+			if (s.length() == o.s.length())
+				return s.compareTo(o.s);
+			return Integer.compare(s.length(), o.s.length());
 		}
+
+		public Integer getId() {
+			return id;
+		}
+	}
+	private void sortbyLength(List<pair> pairs) {	
 		Collections.sort(pairs);
-		sorted_id = new Vector<>(dictionary.size());
+		sorted_id = new Vector<>(pairs.size());
 		for (int i = 0; i < pairs.size(); i++) {
 			sorted_id.add(pairs.get(i).getId());
 		}
@@ -129,48 +107,27 @@ public class Trie {
 		return null;
 	}
 
-	private void adjustRanges(LinkedBlockingQueue<TrieNode> leafs) {
-		while (!leafs.isEmpty()) {
-			try {
-				TrieNode l = leafs.take();
-
-				Range r = l.getRange();
-				if (l.parent != null) {
-					l.parent.updateRange(r);
-					leafs.put(l.parent);
-				}
-			} catch (Exception e) {
-
-			}
-		}
-
-	}
-
 	private void Init(String fileName) {
-		LinkedBlockingQueue<TrieNode> leafs = new LinkedBlockingQueue<TrieNode>();
+		int id = 0;
 		root = CreateTrieNode(null, '\0');
 		try {
-
 			List<String> lines = readandsortFile(fileName);
-			for (String line : lines) {
-
+			List<pair>  pairs=new Vector<>(lines.size());
+ 			for (String line : lines) {
 				String[] inputS = line.split(",");
 				float prob = 1;
 				if (inputS.length > 1) {
 					prob = Float.parseFloat(inputS[1]);
 				}
-				TrieNode leaf = insertString(root, inputS[0], prob);
-				leaf.setRange(new Range(string_id, string_id));
-				leafs.put(leaf);
-				dictionary.put(string_id++, inputS[0]);
+				insertString(root, inputS[0], id, prob);
+				pairs.add(new pair(id,inputS[0]));
+				id++;
 			}
-
+			sortbyLength(pairs);
 		} catch (Exception e) {
-
 			root = null;
 		}
-		adjustRanges(leafs);
-		sortbyLength();
+
 		looked = true;
 	}
 

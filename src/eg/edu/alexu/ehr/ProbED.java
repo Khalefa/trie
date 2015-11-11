@@ -19,6 +19,8 @@ public class ProbED implements IDistanceMetric {
 
 	public ProbED(int tau, float prob, int maxlen) {
 		this.tau = tau;
+		this.prob = prob;
+		this.length = maxlen;
 		CalcProbED(tau, prob, maxlen);
 	}
 
@@ -31,9 +33,7 @@ public class ProbED implements IDistanceMetric {
     void CalcProbED(){
     	val = (1 - prob + (float) tau / length * prob);
     }
-	void CalcProbED(int tau, float prob, int l) {
-		this.prob = prob;
-		this.length = l;
+	void CalcProbED(int tau, float prob, int l) {		
 		CalcProbED();
 	}
 

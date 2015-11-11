@@ -1,17 +1,13 @@
 package eg.edu.alexu.ehr;
 
-import java.io.FileWriter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-public class TopKTrie extends FuzzyTrie {
+public class PropTrie extends FuzzyTrie {
 
-	public TopKTrie(String filename) {
+	public PropTrie(String filename) {
 		super(filename);
 	}
-
 	@Override
 	void buildRootActiveNodes(TrieNode node, Map<TrieNode, IDistanceMetric> activeNodes, int depth, int limit) {
 		if (depth > limit)
@@ -35,7 +31,8 @@ public class TopKTrie extends FuzzyTrie {
 				Util.AddActiveNode(curactiveNodes, n, t);
 			}
 
-			for (TrieNode child : n.children.values()) {				
+			for (TrieNode child : n.children.values()) {
+				// insertion
 				if (child.fromParent == ch) {// we have a match
 					child.getDescendant(curactiveNodes, depth, ll);
 				} else if (ll <= depth) {
@@ -44,38 +41,5 @@ public class TopKTrie extends FuzzyTrie {
 			}
 		}
 		return curactiveNodes;
-	}
-
-	public Map<String, IDistanceMetric> matchPrefix(String prefix, float alpha) {
-		List<TrieNodewithDistance> nodes = super.matchPrefix(prefix);
-		try{
-			FileWriter w=new FileWriter("c:\\data\\output\\a.o");
-		for (TrieNodewithDistance n : nodes) {
-			w.write(n+"\n");
-		}
-		w.close();
-		}catch(Exception e){
-			
-		}
-//		try{
-//		FileWriter w=new FileWriter("c:\\data\\output\\a");
-//		for(int i:sorted_id)
-//			w.write(i+"\t"+dictionary.get(i)+"\n");
-//		w.close();
-//		}catch(Exception e){
-//			
-//		}
-		//	System.out.println(i+"\t"+dictionary.get(i));
-		// Apply TA Algorithm
-		// double threshold=Double.MAX_VALUE;
-		// while(true){
-		// //access nodes
-		//
-		//
-		// //access string
-		//
-		// }
-		//
-		return null;
 	}
 }
