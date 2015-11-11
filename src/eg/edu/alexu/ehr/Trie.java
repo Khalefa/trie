@@ -53,9 +53,7 @@ public class Trie {
 	}
 
 	TrieNode CreateTrieNode(TrieNode v, char ch) {
-		TrieNode n = TrieNodeFactory.createTrieNode(v, ch, 0);
-
-		return n;
+		return new TrieNode(v, ch);
 	}
 	class pair implements Comparable<pair> {
 		int id;

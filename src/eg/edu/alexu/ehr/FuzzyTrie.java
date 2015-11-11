@@ -9,10 +9,9 @@ public class FuzzyTrie extends Trie {
 		super(filename);		
 	}
 
-
-	TrieNode CreateTrieNode(TrieNode v, char ch) {
-		return TrieNodeFactory.createTrieNode(v, ch, 1);
-	}
+//	TrieNode CreateTrieNode(TrieNode v, char ch) {
+//		return TrieNodeFactory.createTrieNode(v, ch, 1);
+//	}
 	private void printActiveNode(Map<TrieNode, IDistanceMetric> activeNodes) {
 		String s="";
 		for(Entry<TrieNode, IDistanceMetric> entry: activeNodes.entrySet()){
@@ -47,8 +46,8 @@ public class FuzzyTrie extends Trie {
 				curactiveNodes.put(n,
 						new ProbED((int) (cparentActiveNodes.get(n).GetDistance() + 1), n.prob, n.rLength.getMax()));
 
-			for (TrieNode node : n.children.values()) {
-				FuzzyTrieNode child = (FuzzyTrieNode) node;
+			for (TrieNode child : n.children.values()) {
+				//FuzzyTrieNode child = (FuzzyTrieNode) node;
 				// insertion
 				if (child.fromParent == ch) {// we have a match
 					child.getDescendant(curactiveNodes, depth, (int) l.GetDistance());
@@ -67,10 +66,10 @@ public class FuzzyTrie extends Trie {
 
 	public List<TrieNodewithDistance> matchPrefix(String prefix){ 
 		List<TrieNodewithDistance> nodes=new Vector<>();
-		FuzzyTrieNode r=(FuzzyTrieNode)root;
+		//FuzzyTrieNode r=(FuzzyTrieNode)root;
 		int tau=prefix.length();
 		Map<TrieNode, IDistanceMetric> activenodes =new HashMap<>();
-		buildRootActiveNodes(r, activenodes, 0, tau);
+		buildRootActiveNodes(root, activenodes, 0, tau);
 	//	System.out.print("Active nodes");
 	//	System.out.println(r); printActiveNode(activenodes);
 		for (char ch : prefix.toCharArray()) {

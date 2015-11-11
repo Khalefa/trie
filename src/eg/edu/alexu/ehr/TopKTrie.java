@@ -38,7 +38,7 @@ public class TopKTrie extends FuzzyTrie {
 			for (TrieNode child : n.children.values()) {				
 				if (child.fromParent == ch) {// we have a match
 					child.getDescendant(curactiveNodes, depth, ll);
-				} else if (ll <= depth) {
+				} else if (ll <depth) {
 					Util.AddActiveNode(curactiveNodes, child, new ED(ll + 1));
 				}
 			}
@@ -49,11 +49,11 @@ public class TopKTrie extends FuzzyTrie {
 	public Map<String, IDistanceMetric> matchPrefix(String prefix, float alpha) {
 		List<TrieNodewithDistance> nodes = super.matchPrefix(prefix);
 		try{
-			FileWriter w=new FileWriter("c:\\data\\output\\a.o");
+			//FileWriter w=new FileWriter("c:\\data\\output\\a.o");
 		for (TrieNodewithDistance n : nodes) {
-			w.write(n+"\n");
+		//	w.write(n+"\n");
 		}
-		w.close();
+		//w.close();
 		}catch(Exception e){
 			
 		}

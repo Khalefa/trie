@@ -96,7 +96,7 @@ public class Test {
 		long duration = (endTime - startTime);
 		System.out.println("build time " + duration / 1000000.0);
 		startTime = System.nanoTime();
-		((TopKTrie) t).matchPrefix("ab", 2);
+		((TopKTrie) t).matchPrefix("abd", 2);
 		endTime = System.nanoTime();
 		duration = (endTime - startTime);
 		System.out.println("access time " + duration / 1000000.0);
