@@ -60,11 +60,21 @@ public class Test {
 
 	public static void main(String[] args) {
 		//testTopk();
+		long startTime = System.nanoTime();
 		PivotalTrie t=new PivotalTrie("c:\\data\\test.data");
-		System.out.println(t.toString());
+		// System.out.println(t);
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		System.out.println("build time " + duration / 1000000.0);
+		
+	//	System.out.println(t.toString());
 		
 		System.err.println("*************");
+		 startTime = System.nanoTime();
 		t.matchPrefix("nlis",2);
+		 endTime = System.nanoTime();
+		 duration = (endTime - startTime);
+		System.out.println("access time " + duration / 1000000.0);
 		
 	}
 
