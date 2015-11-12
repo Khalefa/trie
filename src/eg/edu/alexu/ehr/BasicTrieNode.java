@@ -2,6 +2,7 @@ package eg.edu.alexu.ehr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -14,6 +15,7 @@ public class BasicTrieNode {
 	boolean leaf;
 	BasicTrieNode parent;
 	char fromParent;
+	int depth=0;
 	
 	public int getID() {
 		return id;
@@ -53,51 +55,26 @@ public class BasicTrieNode {
 		}
 		return leafs;
 	}
-	Map<BasicTrieNode, IDistanceMetric> getDescendant(Map<BasicTrieNode, IDistanceMetric> descendents, int depth, int k) {
-		class pair {
-			public BasicTrieNode n;
-			public int depth;
 	
-			public pair(BasicTrieNode n, int depth) {
-				this.n = n;
-				this.depth = depth;
-			}
+	private void getDescendants(List<BasicTrieNode> descendents, int d,int limit){
+		if( limit <d)
+			return;
+		descendents.add(this);
+		for (char c : children.keySet()) {
+			children.get(c).getDescendants(descendents, d + 1, limit);
 		}
-	
-		ArrayList<pair> queue = new ArrayList<pair>();
-		queue.add(new pair(this, k));
-		if (k > depth)
-			return descendents;
-		
-		descendents.put(this, new ED(k));
-	
-		while (!queue.isEmpty()) {
-			// get the first node of the queue
-			pair p = queue.remove(0);
-			// add children to the queue
-			if (p.depth < depth) {
-				for (BasicTrieNode c : p.n.children.values()) {
-					IDistanceMetric v = descendents.get(c);
-					int vv = p.depth + 1; 					
-					if (vv <= depth) {							
-						Util.AddActiveNode(descendents, c, new ED(p.depth + 1));
-						queue.add(new pair(c, vv));
-					}
-				}
-			}
-		}
-		return descendents;
 	}
+	
+void getDescendant(List<BasicTrieNode> descendents, int limit) {		
+		descendents.add(this);
+		
+		for (char c : children.keySet()) {
+			children.get(c).getDescendants(descendents,  1, limit);
+		}
+	}
+	
 //	void getDescendant(Map<BasicTrieNode, IDistanceMetric> descendents, int depth, int limit) {
-//		
-//		if (depth > limit)
-//			return ;
-//		
-//		descendents.put(this, new ED(depth));
-//		
-//		for (char c : children.keySet()) {
-//			children.get(c).getDescendant(descendents, depth + 1, limit);
-//		}
+//	  getDescendantR(descendents, depth, limit);
 //	}
 	@Override
 	public String toString() {

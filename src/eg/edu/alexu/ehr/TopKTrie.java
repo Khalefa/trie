@@ -1,9 +1,10 @@
-package eg.edu.alexu.ehr;
+/*package eg.edu.alexu.ehr;
 
 import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 public class TopKTrie extends FuzzyTrie {
 
@@ -15,38 +16,38 @@ public class TopKTrie extends FuzzyTrie {
 		return new TrieNode(v, ch);
 	}
 
-	// @Override
-	// void buildRootActiveNodes(BasicTrieNode node, Map<BasicTrieNode,
-	// IDistanceMetric> activeNodes, int depth,
-	// int limit) {
-	// class pair {
-	// public BasicTrieNode n;
-	// public int depth;
-	//
-	// public pair(BasicTrieNode n, int depth) {
-	// this.n = n;
-	// this.depth = depth;
-	// }
-	// }
-	// if (depth > limit)
-	// return;
-	// activeNodes.put(node, new ED(depth));
-	// List<pair> q = new Vector<pair>();
-	// q.add(new pair(node, depth));
-	// while (!q.isEmpty()) {
-	// pair btn = q.remove(0);
-	// if (btn.depth <= limit) {
-	//
-	// for (BasicTrieNode n : node.children.values())
-	// if (btn.depth < limit) {
-	// activeNodes.put(n, new ED(btn.depth + 1));
-	// q.add(new pair(n, btn.depth + 1));
-	// }
-	// }
-	// }
-	// }
+//	 @Override
+	 void buildRootActiveNodesI(BasicTrieNode node, Map<BasicTrieNode,
+	 IDistanceMetric> activeNodes, int depth,
+	 int limit) {
+	 class pair {
+	 public BasicTrieNode n;
+	 public int depth;
+	
+	 public pair(BasicTrieNode n, int depth) {
+	 this.n = n;
+	 this.depth = depth;
+	 }
+	 }
+	 if (depth > limit)
+	 return;
+	 activeNodes.put(node, new ED(depth));
+	 List<pair> q = new Vector<pair>();
+	 q.add(new pair(node, depth));
+	 while (!q.isEmpty()) {
+	 pair btn = q.remove(0);
+	 if (btn.depth <= limit) {
+	
+	 for (BasicTrieNode n : node.children.values())
+	 if (btn.depth < limit) {
+	 activeNodes.put(n, new ED(btn.depth + 1));
+	 q.add(new pair(n, btn.depth + 1));
+	 }
+	 }
+	 }
+	 }
 
-	void buildRootActiveNodes(BasicTrieNode node, Map<BasicTrieNode, IDistanceMetric> activeNodes, int depth,
+	void buildRootActiveNodesR(BasicTrieNode node, Map<BasicTrieNode, IDistanceMetric> activeNodes, int depth,
 			int limit) {
 		if (depth > limit)
 			return;
@@ -54,8 +55,12 @@ public class TopKTrie extends FuzzyTrie {
 		activeNodes.put(node, new ED(depth));
 
 		for (char c : node.children.keySet()) {
-			buildRootActiveNodes(node.children.get(c), activeNodes, depth + 1, limit);
+			buildRootActiveNodesR(node.children.get(c), activeNodes, depth + 1, limit);
 		}
+	}
+	void buildRootActiveNodes(BasicTrieNode node, Map<BasicTrieNode, IDistanceMetric> activeNodes, int depth,
+			int limit) {
+		buildRootActiveNodesI(node, activeNodes, depth, limit);
 	}
 
 	Map<BasicTrieNode, IDistanceMetric> IncrementalBuildActiveNode(char ch,
@@ -115,3 +120,4 @@ public class TopKTrie extends FuzzyTrie {
 		return null;
 	}
 }
+*/

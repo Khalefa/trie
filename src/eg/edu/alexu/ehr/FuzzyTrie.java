@@ -3,7 +3,7 @@ package eg.edu.alexu.ehr;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class FuzzyTrie extends Trie {
+public abstract class FuzzyTrie extends Trie {
 
 	public FuzzyTrie(String filename) {
 		super(filename);

@@ -40,26 +40,29 @@ public class Test {
 
 	public static void testTopk() {
 		long startTime = System.nanoTime();
-		t = new TopKTrie("c:\\data\\author+title.data");
+		t = new Trie("c:\\data\\author.data");
 		// System.out.println(t);
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
 		System.out.println("build time " + duration / 1000000.0);
 		startTime = System.nanoTime();
-		((TopKTrie) t).matchPrefix("abddefg", 2);
+		//((TopKTrie) t).matchPrefix("abddefg", 2);
 		endTime = System.nanoTime();
 		duration = (endTime - startTime);
 		System.out.println("access time " + duration / 1000000.0);
 	}
 
 	public static void testProp() {
-		t = new PropTrie("c:\\data\\ptest.data");
-		System.out.println(t);
-		// t.matchPrefix("ab",2);
+//		t = new PropTrie("c:\\data\\ptest.data");
+//		System.out.println(t);
+//		// t.matchPrefix("ab",2);
 	}
 
 	public static void main(String[] args) {
-		testTopk();
+		//testTopk();
+		PivotalTrie t=new PivotalTrie("c:\\data\\test.data");
+		t.matchPrefix("nlis",2);
+		
 	}
 
 }

@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 public class Trie {
 
 	boolean looked = false;
-	//Map<Integer, String> dictionary = new HashMap<Integer, String>();
+	// Map<Integer, String> dictionary = new HashMap<Integer, String>();
 	List<Integer> sorted_id = null;
 	BasicTrieNode root = null;
 
@@ -37,13 +37,15 @@ public class Trie {
 		if (looked)
 			return null;
 		BasicTrieNode v = root;
-
+		int d = 1;
 		v.adjust(id, len, prob);
 		BasicTrieNode next = v;
 		for (char ch : s.toCharArray()) {
 			next = v.children.get(ch);
 			if (next == null)
 				v.children.put(ch, next = CreateTrieNode(v, ch));
+			next.depth = d;
+			d++;
 			next.adjust(id, len, prob);
 			v = next;
 		}
@@ -122,9 +124,9 @@ public class Trie {
 
 				String s = inputS[0];
 				int l = s.length();
-				if(truncate)
-				if (s.length() > 10)
-					s = s.substring(0, 10);
+				if (truncate)
+					if (s.length() > 10)
+						s = s.substring(0, 10);
 				insertString(root, s, id, prob, l);
 				pairs.add(new pair(id, s));
 				id++;
@@ -142,7 +144,7 @@ public class Trie {
 	public Trie(String filename) {
 		Init(filename, false);
 	}
-	
+
 	public Trie(String filename, boolean truncate) {
 		Init(filename, true);
 	}
