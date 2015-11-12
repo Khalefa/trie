@@ -19,75 +19,25 @@ import javax.swing.SwingUtilities;
 import eg.edu.alexu.ehr.*;
 
 /**
- * @author David
+ * @author Basio
  */
 public class Test {
 
 	public Test() {
-
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		JTextField f = new JTextField(10);
-
 		AutoSuggestor autoSuggestor = new AutoSuggestor(f, frame, (FuzzyTrie) t, Color.WHITE.brighter(), Color.BLUE,
-				Color.RED, 0.75f) {
-			// see
-
-		};
-
+				Color.RED, 0.75f); 
 		JPanel p = new JPanel();
-
 		p.add(f);
-
 		frame.add(p);
-
 		frame.pack();
 		frame.setVisible(true);
 	}
 
 	static Trie t;
 
-	// static void printSimilarString(String s, int k) {
-	// System.out.println("Getting string similar to " + s);
-	// Map<String, Double> sim = t.GetSimilarStrings(s, k);
-	// try {
-	// PrintWriter w = new PrintWriter("c:\\data\\o.txt", "UTF-8");
-	// for (Map.Entry<String, Double> ss : sim.entrySet()) {
-	// w.println("" + ss.getKey() + "\t" + ss.getValue());
-	// }
-	// w.close();
-	// } catch (FileNotFoundException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (UnsupportedEncodingException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// }
-
-	// public static void testRanges() {
-	// List<Range> ranges = new Vector<Range>();
-	// ranges.add(new Range(1, 3));
-	// ranges.add(new Range(2, 3));
-	// ranges.add(new Range(0, 3));
-	// ranges.add(new Range(1, 4));
-	// ranges.add(new Range(5, 6));
-	// ranges.add(new Range(10, 13));
-	// ranges.add(new Range(11, 13));
-	// ranges.add(new Range(1, 3));
-	// ranges.add(new Range(100, 300));
-	//
-	// for (Range r : ranges) {
-	// System.out.println(r);
-	// }
-	//
-	// List<Range> ranges_combined=Range.combineRanges(ranges);
-	// for (Range r : ranges_combined) {
-	// System.out.println("* "+ r);
-	// }
-	// }
 	public static void testTopk() {
 		long startTime = System.nanoTime();
 		t = new TopKTrie("c:\\data\\author.data");
@@ -96,7 +46,7 @@ public class Test {
 		long duration = (endTime - startTime);
 		System.out.println("build time " + duration / 1000000.0);
 		startTime = System.nanoTime();
-		((TopKTrie) t).matchPrefix("abd", 2);
+		((TopKTrie) t).matchPrefix("abddefg", 2);
 		endTime = System.nanoTime();
 		duration = (endTime - startTime);
 		System.out.println("access time " + duration / 1000000.0);
@@ -110,36 +60,6 @@ public class Test {
 
 	public static void main(String[] args) {
 		testTopk();
-		// testRanges();
-		// long startTime = System.nanoTime();
-		// t = new FuzzyTrie("c:\\data\\author.data");
-		// // System.out.println(t);
-		//
-		// long endTime = System.nanoTime();
-		//// //System.out.println(t);
-		//// /*
-		//// SwingUtilities.invokeLater(new Runnable() {
-		////
-		//// @Override public void run() { new Test(); } });
-		//// */
-		//// Map<TrieNode, IDistanceMetric> m = t.exactSearch("l").getLeafs(new
-		// ED(0));
-		//// for (Entry<TrieNode, IDistanceMetric> e : m.entrySet()) {
-		//// System.out.println("*" + e.getKey().getID() + "," +
-		// e.getValue().GetDistance());
-		//// }
-		////
-		////
-		// long duration = (endTime - startTime);
-		// System.out.println("build time "+duration/1000000.0 );
-		// startTime = System.nanoTime();
-		// printSimilarString("li", 1);
-		// endTime = System.nanoTime();
-		// duration=endTime-startTime;
-		// System.out.println("access time "+duration/1000000.0);
-		//// //printSimilarString("nliu", 3);
-		//
-
 	}
 
 }

@@ -11,9 +11,9 @@ import java.io.InputStreamReader;
 public class Trie {
 
 	boolean looked = false;
-	Map<Integer, String> dictionary = new HashMap<Integer, String>();
+	//Map<Integer, String> dictionary = new HashMap<Integer, String>();
 	List<Integer> sorted_id = null;
-	TrieNode root = null;
+	BasicTrieNode root = null;
 
 	@Override
 	public String toString() {
@@ -22,10 +22,10 @@ public class Trie {
 		return s;
 	}
 
-	public TrieNode exactSearch(String s) {
-		TrieNode cur = root;
+	public BasicTrieNode exactSearch(String s) {
+		BasicTrieNode cur = root;
 		for (char ch : s.toCharArray()) {
-			TrieNode next = cur.children.get(ch);
+			BasicTrieNode next = cur.children.get(ch);
 			if (next == null)
 				return cur;
 			cur = next;
@@ -33,28 +33,29 @@ public class Trie {
 		return cur;
 	}
 
-	TrieNode insertString(TrieNode root, String s, int id, float prob) {
+	BasicTrieNode insertString(BasicTrieNode root, String s, int id, float prob, int len) {
 		if (looked)
 			return null;
-		TrieNode v = root;
-		int len = s.length();
-		v.adjustTrieNode(id, len, prob);
-		TrieNode next = v;
+		BasicTrieNode v = root;
+
+		v.adjust(id, len, prob);
+		BasicTrieNode next = v;
 		for (char ch : s.toCharArray()) {
 			next = v.children.get(ch);
 			if (next == null)
 				v.children.put(ch, next = CreateTrieNode(v, ch));
-			next.adjustTrieNode(id, len, prob);
+			next.adjust(id, len, prob);
 			v = next;
 		}
-		v.adjustTrieNode(id, len, prob);
+		v.adjust(id, len, prob);
 		v.leaf = true;
 		return v;
 	}
 
-	TrieNode CreateTrieNode(TrieNode v, char ch) {
-		return new TrieNode(v, ch);
+	BasicTrieNode CreateTrieNode(BasicTrieNode v, char ch) {
+		return new BasicTrieNode(v, ch);
 	}
+
 	class pair implements Comparable<pair> {
 		int id;
 		String s;
@@ -75,7 +76,8 @@ public class Trie {
 			return id;
 		}
 	}
-	private void sortbyLength(List<pair> pairs) {	
+
+	private void sortbyLength(List<pair> pairs) {
 		Collections.sort(pairs);
 		sorted_id = new Vector<>(pairs.size());
 		for (int i = 0; i < pairs.size(); i++) {
@@ -105,32 +107,44 @@ public class Trie {
 		return null;
 	}
 
-	private void Init(String fileName) {
+	private void Init(String fileName, boolean truncate) {
 		int id = 0;
 		root = CreateTrieNode(null, '\0');
 		try {
 			List<String> lines = readandsortFile(fileName);
-			List<pair>  pairs=new Vector<>(lines.size());
- 			for (String line : lines) {
-				String[] inputS = line.split(",");
+			List<pair> pairs = new Vector<>(lines.size());
+			for (String line : lines) {
+				String[] inputS = line.split("\t");
 				float prob = 1;
 				if (inputS.length > 1) {
 					prob = Float.parseFloat(inputS[1]);
 				}
-				insertString(root, inputS[0], id, prob);
-				pairs.add(new pair(id,inputS[0]));
+
+				String s = inputS[0];
+				int l = s.length();
+				if(truncate)
+				if (s.length() > 10)
+					s = s.substring(0, 10);
+				insertString(root, s, id, prob, l);
+				pairs.add(new pair(id, s));
 				id++;
 			}
 			sortbyLength(pairs);
 		} catch (Exception e) {
 			root = null;
+			System.err.println("Error reading the input file");
+			System.err.println(e.getMessage());
 		}
 
 		looked = true;
 	}
 
 	public Trie(String filename) {
-		Init(filename);
+		Init(filename, false);
+	}
+	
+	public Trie(String filename, boolean truncate) {
+		Init(filename, true);
 	}
 
 }

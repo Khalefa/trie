@@ -8,8 +8,8 @@ public class PropTrie extends FuzzyTrie {
 	public PropTrie(String filename) {
 		super(filename);
 	}
-	@Override
-	void buildRootActiveNodes(TrieNode node, Map<TrieNode, IDistanceMetric> activeNodes, int depth, int limit) {
+	//@Override
+	void buildRootActiveNodes(BasicTrieNode node, Map<BasicTrieNode, IDistanceMetric> activeNodes, int depth, int limit) {
 		if (depth > limit)
 			return;
 		activeNodes.put(node, new ED(depth));
@@ -18,12 +18,12 @@ public class PropTrie extends FuzzyTrie {
 		}
 	}
 
-	Map<TrieNode, IDistanceMetric> IncrementalBuildActiveNode(char ch,
-			Map<TrieNode, IDistanceMetric> cparentActiveNodes, int depth) {
-		Map<TrieNode, IDistanceMetric> curactiveNodes = new HashMap<TrieNode, IDistanceMetric>();
+	Map<BasicTrieNode, IDistanceMetric> IncrementalBuildActiveNode(char ch,
+			Map<BasicTrieNode, IDistanceMetric> cparentActiveNodes, int depth) {
+		Map<BasicTrieNode, IDistanceMetric> curactiveNodes = new HashMap<BasicTrieNode, IDistanceMetric>();
 
 		// add all p active node to this, with distance +1 if possible
-		for (TrieNode n : cparentActiveNodes.keySet()) {
+		for (BasicTrieNode n : cparentActiveNodes.keySet()) {
 			IDistanceMetric l = cparentActiveNodes.get(n);
 			int ll = (int) l.GetDistance();
 			if (ll < depth) {
@@ -31,7 +31,7 @@ public class PropTrie extends FuzzyTrie {
 				Util.AddActiveNode(curactiveNodes, n, t);
 			}
 
-			for (TrieNode child : n.children.values()) {
+			for (BasicTrieNode child : n.children.values()) {
 				// insertion
 				if (child.fromParent == ch) {// we have a match
 					child.getDescendant(curactiveNodes, depth, ll);

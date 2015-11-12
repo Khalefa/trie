@@ -1,9 +1,9 @@
 package eg.edu.alexu.ehr;
 
 public class TrieNodewithDistance implements Comparable<TrieNodewithDistance> {
-TrieNode n;
+BasicTrieNode n;
 IDistanceMetric d;
-public TrieNodewithDistance(TrieNode n, IDistanceMetric d){
+public TrieNodewithDistance(BasicTrieNode n, IDistanceMetric d){
 	this.n=n;
 	this.d=d;
 }
@@ -14,7 +14,7 @@ public int compareTo(TrieNodewithDistance o) {
 public IDistanceMetric getD(){
 	return d;
 }
-public TrieNode getTrieNode(){
+public BasicTrieNode getTrieNode(){
 	return n;
 }
 

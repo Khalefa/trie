@@ -3,7 +3,7 @@ package eg.edu.alexu.ehr;
 import java.util.Map;
 
 public class Util {
-	static public void AddActiveNode( Map<TrieNode, IDistanceMetric>  nodes, TrieNode n, IDistanceMetric dist){
+	static public void AddActiveNode( Map<BasicTrieNode, IDistanceMetric>  nodes, BasicTrieNode n, IDistanceMetric dist){
 		 if(nodes.get(n)==null){
 			 nodes.put(n,dist);
 		 }else {
