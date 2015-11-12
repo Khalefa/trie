@@ -61,6 +61,9 @@ public class Test {
 	public static void main(String[] args) {
 		//testTopk();
 		PivotalTrie t=new PivotalTrie("c:\\data\\test.data");
+		System.out.println(t.toString());
+		
+		System.err.println("*************");
 		t.matchPrefix("nlis",2);
 		
 	}

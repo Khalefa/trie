@@ -78,7 +78,7 @@ void getDescendant(List<BasicTrieNode> descendents, int limit) {
 //	}
 	@Override
 	public String toString() {
-		return "BTN[" + id + "]";
+		return "BTN[" + id + "]"+"\n";
 	}
 
 	public String toString(int l) {

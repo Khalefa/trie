@@ -38,55 +38,58 @@ public class PivotalTrie extends Trie {
 	}
 
 	List<PivotalActiveNode> ICPAN(String px, List<PivotalActiveNode> cparentActiveNodes, int tau) {
-		System.out.println("PivotalTrie.ICPAN()");
-		System.out.println("px"+px);
+		System.out.println("PivotalTrie.ICPAN("+px+","+tau+")");
+		//System.out.println("px  " + px);
 		List<PivotalActiveNode> activenodes = new Vector<>();
 		for (PivotalActiveNode pn : cparentActiveNodes) {
-			System.out.println("Considering "+pn);
+			System.out.println("Considering " + pn);
 			// deletion
-			BasicTrieNode n=pn.node;
+			BasicTrieNode n = pn.node;
 			PivotalActiveNode del = new PivotalActiveNode(n);
 			del.tau_px = pn.tau_px + 1;
-			if (del.tau_px <= tau){
-						activenodes.add(del);
-						System.out.println("\tAdding[del] "+del);
+			del.tau_pi=pn.tau_pi;
+			del.pi=pn.pi;
+			if (del.tau_px <= tau) {
+				activenodes.add(del);
+				System.out.println("\tAdding[del] " + del);
 			}
-			
-			//Descendants of n
-			List<BasicTrieNode> descendants=new Vector<>();
-			n.getDescendant(descendants, tau-pn.tau_pi+1);
-			
-			for(BasicTrieNode n_dash:descendants){
-//				System.out.println("\t n' is  "+n_dash);
-//				System.err.println("ndash "+n_dash.fromParent)
-//				;
-//				System.err.println("px "+px+" "+px.charAt(px.length()-1));
-				if(n_dash.fromParent==px.charAt(px.length()-1)){
-				PivotalActiveNode match = new PivotalActiveNode(n_dash);
-				int ed_px_1=pn.tau_pi+ Math.max(n_dash.depth-pn.node.depth-1, px.length()-pn.pi.length());
-				match.tau_pi=match.tau_px=ed_px_1;
-				match.pi=px;
-				if(ed_px_1 <= tau){					
-					activenodes.add(match);	System.out.println("\tAdding[match] "+match);
-				}
+
+			// Descendants of n
+			List<BasicTrieNode> descendants = new Vector<>();
+			n.getDescendant(descendants, tau - pn.tau_pi + 1);
+
+			for (BasicTrieNode n_dash : descendants) {
+				if (n_dash.fromParent == px.charAt(px.length() - 1)) {
+					PivotalActiveNode match = new PivotalActiveNode(n_dash);
+					int ed_px_1 = pn.tau_pi + Math.max(n_dash.depth - n.depth - 1, px.length() - pn.pi.length()-1);
+					match.tau_pi = match.tau_px = ed_px_1;
+					match.pi = px;
+					if (ed_px_1 <= tau) {
+						activenodes.add(match);
+						System.out.println("\tAdding[match] " + match);
+					}
 				}
 			}
-			
 
 		}
-return activenodes;
+		System.out.println("Active nodes are:");
+		for (PivotalActiveNode p : activenodes)
+			System.out.print(p + ",");
+		System.out.println("");
+		System.out.println("************************************************************");
+		return activenodes;
 	}
 
 	public List<TrieNodewithDistance> matchPrefix(String query, int tau) {
 		List<PivotalActiveNode> activenodes = new Vector<>();
 		activenodes.add(new PivotalActiveNode(root));
-	//	System.out.println("Size of root active node" + activenodes.size());
+		// System.out.println("Size of root active node" + activenodes.size());
 
 		String px = "";
 		for (char ch : query.toCharArray()) {
 			px = px + ch;
 			activenodes = ICPAN(px, activenodes, tau);
-			//System.out.println("Size of  active node" + activenodes.size());
+			// System.out.println("Size of active node" + activenodes.size());
 			// System.out.print("Active nodes ");
 			// printActiveNode(activenodes);
 		}
