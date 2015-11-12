@@ -40,7 +40,7 @@ public class Test {
 
 	public static void testTopk() {
 		long startTime = System.nanoTime();
-		t = new TopKTrie("c:\\data\\author.data");
+		t = new TopKTrie("c:\\data\\author+title.data");
 		// System.out.println(t);
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
