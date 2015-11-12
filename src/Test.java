@@ -61,7 +61,7 @@ public class Test {
 	public static void main(String[] args) {
 		//testTopk();
 		long startTime = System.nanoTime();
-		PivotalTrie t=new PivotalTrie("c:\\data\\test.data");
+		PivotalTrie t=new PivotalTrie("c:\\data\\author.data");
 		// System.out.println(t);
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
@@ -71,7 +71,7 @@ public class Test {
 		
 		System.err.println("*************");
 		 startTime = System.nanoTime();
-		t.matchPrefix("nlis",2);
+		t.matchPrefix("nlis",3);
 		 endTime = System.nanoTime();
 		 duration = (endTime - startTime);
 		System.out.println("access time " + duration / 1000000.0);
