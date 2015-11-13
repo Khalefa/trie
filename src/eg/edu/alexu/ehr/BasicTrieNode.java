@@ -15,21 +15,23 @@ public class BasicTrieNode {
 	boolean leaf;
 	BasicTrieNode parent;
 	char fromParent;
-	int depth=0;
-	
+	int depth = 0;
+
 	public int getID() {
 		return id;
 	}
+
 	void adjust(int id, int len, float prob) {
-		
+
 	}
+
 	public BasicTrieNode(BasicTrieNode p, char x) {
 		this.id = counter;
 		counter++;
 		parent = p;
 		fromParent = x;// holding current node character
 	}
-	
+
 	public Map<BasicTrieNode, IDistanceMetric> getLeafs(IDistanceMetric dist) {
 		class pair {
 			public BasicTrieNode n;
@@ -49,36 +51,33 @@ public class BasicTrieNode {
 			pair p = queue.remove(0);
 			for (BasicTrieNode c : p.n.children.values()) {
 				if (c.leaf)
-					leafs.put(c,  new ED(p.depth + 1+(int)dist.GetDistance()));
+					leafs.put(c, new ED(p.depth + 1 + (int) dist.GetDistance()));
 				queue.add(new pair(c, p.depth + 1));
 			}
 		}
 		return leafs;
 	}
-	
-	private void getDescendants(List<BasicTrieNode> descendents, int d,int limit){
-		if( limit <d)
+
+	private void getDescendants(List<BasicTrieNode> descendents, int d, int limit, char ch) {
+		if (limit < d)
 			return;
-		descendents.add(this);
+		if (fromParent == ch)
+			descendents.add(this);
 		for (char c : children.keySet()) {
-			children.get(c).getDescendants(descendents, d + 1, limit);
+			children.get(c).getDescendants(descendents, d + 1, limit, ch);
 		}
 	}
-	
-void getDescendant(List<BasicTrieNode> descendents, int limit) {		
-		descendents.add(this);
+
+	void getDescendant(List<BasicTrieNode> descendents, int limit, char ch) {
 		
 		for (char c : children.keySet()) {
-			children.get(c).getDescendants(descendents,  1, limit);
+			children.get(c).getDescendants(descendents, 1, limit, ch);
 		}
 	}
-	
-//	void getDescendant(Map<BasicTrieNode, IDistanceMetric> descendents, int depth, int limit) {
-//	  getDescendantR(descendents, depth, limit);
-//	}
+
 	@Override
 	public String toString() {
-		return "BTN[" + id + "]"+"\n";
+		return "BTN[" + id + "]" + "\n";
 	}
 
 	public String toString(int l) {
@@ -89,6 +88,6 @@ void getDescendant(List<BasicTrieNode> descendents, int limit) {
 		for (Entry<Character, BasicTrieNode> child : children.entrySet()) {
 			s = s + tabs + child.getKey() + "\t" + child.getValue().toString(l + 1);
 		}
-		return s+"";
+		return s + "";
 	}
 }

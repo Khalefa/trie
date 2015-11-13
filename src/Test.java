@@ -28,7 +28,7 @@ public class Test {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JTextField f = new JTextField(10);
 		AutoSuggestor autoSuggestor = new AutoSuggestor(f, frame, (FuzzyTrie) t, Color.WHITE.brighter(), Color.BLUE,
-				Color.RED, 0.75f); 
+				Color.RED, 0.75f);
 		JPanel p = new JPanel();
 		p.add(f);
 		frame.add(p);
@@ -46,36 +46,38 @@ public class Test {
 		long duration = (endTime - startTime);
 		System.out.println("build time " + duration / 1000000.0);
 		startTime = System.nanoTime();
-		//((TopKTrie) t).matchPrefix("abddefg", 2);
+		// ((TopKTrie) t).matchPrefix("abddefg", 2);
 		endTime = System.nanoTime();
 		duration = (endTime - startTime);
 		System.out.println("access time " + duration / 1000000.0);
 	}
 
 	public static void testProp() {
-//		t = new PropTrie("c:\\data\\ptest.data");
-//		System.out.println(t);
-//		// t.matchPrefix("ab",2);
+		// t = new PropTrie("c:\\data\\ptest.data");
+		// System.out.println(t);
+		// // t.matchPrefix("ab",2);
 	}
 
 	public static void main(String[] args) {
-		//testTopk();
+		// testTopk();
 		long startTime = System.nanoTime();
-		PivotalTrie t=new PivotalTrie("c:\\data\\author.data");
-		// System.out.println(t);
+		PivotalTrie t = new PivotalTrie("c:\\data\\test.data");
+		System.out.println(t);
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
 		System.out.println("build time " + duration / 1000000.0);
-		
-	//	System.out.println(t.toString());
-		
-		System.err.println("*************");
-		 startTime = System.nanoTime();
-		t.matchPrefix("nlis",3);
-		 endTime = System.nanoTime();
-		 duration = (endTime - startTime);
-		System.out.println("access time " + duration / 1000000.0);
-		
+
+		// System.out.println(t.toString());
+		//for (int i = 0; i <= 5; i++) {
+		int i=2;	
+		System.err.println("******" + i + "******");
+			startTime = System.nanoTime();
+			t.matchPrefix("nlis", i);
+			endTime = System.nanoTime();
+			duration = (endTime - startTime);
+			System.out.println("access time " + duration / 1000000.0);
+	//	}
+
 	}
 
 }
