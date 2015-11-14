@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 public class Trie {
 
 	boolean looked = false;
-	// Map<Integer, String> dictionary = new HashMap<Integer, String>();
+	Map<Integer, String> dictionary = new HashMap<Integer, String>();
 	List<Integer> sorted_id = null;
 	BasicTrieNode root = null;
 
@@ -36,6 +36,7 @@ public class Trie {
 	BasicTrieNode insertString(BasicTrieNode root, String s, int id, float prob, int len) {
 		if (looked)
 			return null;
+		dictionary.put(id, s);
 		BasicTrieNode v = root;
 		int d = 1;
 		v.adjust(id, len, prob);

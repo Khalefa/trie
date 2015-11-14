@@ -14,10 +14,7 @@ public class PivotalTrie extends Trie {
 		String pi = "";
 		int tau_pi = 0;
 
-//		BasicTrieNode CreateTrieNode(BasicTrieNode v, char ch) {
-//			return new TrieNode(v, ch);
-//		}
-	
+
 		PivotalActiveNode(BasicTrieNode r) {
 			node = r;
 		}
@@ -97,8 +94,12 @@ public class PivotalTrie extends Trie {
 		}
 		return activenodes;
 	}
-
-	public List<TrieNodewithDistance> matchPrefix(String query, int tau) {
+	//@Override
+	BasicTrieNode CreateTrieNode(BasicTrieNode v, char ch) {
+		return new TrieNode(v, ch);
+	}
+	
+	public List<String> matchPrefix(String query, int tau) {
 		Map<BasicTrieNode, PivotalActiveNode> activenodes = new HashMap<>();
 		activenodes.put(root, new PivotalActiveNode(root));
 		String px = "";
@@ -106,6 +107,14 @@ public class PivotalTrie extends Trie {
 			px = px + ch;
 			activenodes = ICPAN(px, activenodes, tau);
 			}
+		//now retrive these strings
+		List<String> strings=new Vector<>();
+		for(PivotalActiveNode p:activenodes.values()){
+			TrieNode n=(TrieNode) p.node;
+			for(int i=n.rID.min; i<=n.rID.max;i++)
+				System.out.println(dictionary.get(i)+"@"+p.tau_px);
+			
+		}
 		return null;
 	}
 
