@@ -42,6 +42,13 @@ public class Test {
 	public static void main(String[] args) {
 
 		t = new PivotalTrie("c:\\data\\author.data");
+//		PivotalTrie tt=(PivotalTrie)t;
+//		
+//		Map<BasicTrieNode, PivotalActiveNode> a=tt.matchPrefix("mohamed_e_", 2);
+//	for(String s:tt.GetStrings(a,2)){
+//		System.out.println(s);
+		
+	
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override

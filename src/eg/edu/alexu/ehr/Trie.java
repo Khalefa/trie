@@ -147,7 +147,7 @@ public class Trie {
 	}
 
 	public Trie(String filename, boolean truncate) {
-		Init(filename, true);
+		Init(filename, truncate);
 	}
 
 }
