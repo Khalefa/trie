@@ -1,3 +1,4 @@
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -21,7 +22,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import eg.edu.alexu.ehr.FuzzyTrie;
+import eg.edu.alexu.ehr.*;
 
 class AutoSuggestor {
 
@@ -30,7 +31,8 @@ class AutoSuggestor {
 	private JPanel suggestionsPanel;
 	private JWindow autoSuggestionPopUpWindow;
 	private String typedWord;
-	private  FuzzyTrie trie;
+	//private  FuzzyTrie trie;
+	private PivotalTrie trie;
 	private int currentIndexOfSpace, tW, tH;
 	private DocumentListener documentListener = new DocumentListener() {
 		@Override
@@ -51,7 +53,7 @@ class AutoSuggestor {
 	private final Color suggestionsTextColor;
 	private final Color suggestionFocusedColor;
 
-	public AutoSuggestor(JTextField textField, Window mainWindow, FuzzyTrie t, Color popUpBackground,
+	public AutoSuggestor(JTextField textField, Window mainWindow, PivotalTrie t, Color popUpBackground,
 			Color textColor, Color suggestionFocusedColor, float opacity) {
 		this.textField = textField;
 		this.suggestionsTextColor = textColor;
@@ -186,21 +188,25 @@ class AutoSuggestor {
 		 * (Exception e) { // TODO Auto-generated catch block
 		 * e.printStackTrace(); }
 		 */
-		Map<String,Double> M = null;//trie.GetSimilarStrings(typedWord, 10);
+		//Map<String,Double> M = null;//trie.GetSimilarStrings(typedWord, 10);
+		List<String> M=trie.matchPrefix(typedWord,2);
 	
-
-		List<String> list = new ArrayList<String>();
-		list.addAll(M.keySet());
 		if (M.size() == 0) {
 
 			if (autoSuggestionPopUpWindow.isVisible()) {
 				autoSuggestionPopUpWindow.setVisible(false);
 			}
 		} else {
-			for (int t = list.size() - 1; t >= 0; t--) {
-				addWordToSuggestions(list.get(t));
+			if (M.size()<=50){
+			for (int t =0; t < M.size(); t++) {
+				addWordToSuggestions(M.get(t));
 			}
-
+			}
+			else{
+				for (int t =0; t <50; t++) {
+					addWordToSuggestions(M.get(t));
+				}
+			}
 			showPopUpWindow();
 			setFocusToTextField();
 		}
