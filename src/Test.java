@@ -39,53 +39,16 @@ public class Test {
 
 	static Trie t;
 
-	public static void testTopk() {
-		long startTime = System.nanoTime();
-		t = new Trie("c:\\data\\author.data");
-		// System.out.println(t);
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
-		System.out.println("build time " + duration / 1000000.0);
-		startTime = System.nanoTime();
-		// ((TopKTrie) t).matchPrefix("abddefg", 2);
-		endTime = System.nanoTime();
-		duration = (endTime - startTime);
-		System.out.println("access time " + duration / 1000000.0);
-	}
-
-	public static void testProp() {
-		// t = new PropTrie("c:\\data\\ptest.data");
-		// System.out.println(t);
-		// // t.matchPrefix("ab",2);
-	}
-
 	public static void main(String[] args) {
-//		// testTopk();
-	//long startTime = System.nanoTime();
-	 t = new PivotalTrie("author.data");
-		
-////System.out.println(t);
-//		long endTime = System.nanoTime();
-//		long duration = (endTime - startTime);
-//		System.out.println("build time " + duration / 1000000.0);
-//
-//		// System.out.println(t.toString());
-//		//for (int i = 0; i <= 5; i++) {
-//		int i=3;	
-//		System.err.println("******" + i + "******");
-//			startTime = System.nanoTime();
-//			List<String> M=((PivotalTrie) t).matchPrefix("nlis", i);
-//			
-//			endTime = System.nanoTime();
-//			duration = (endTime - startTime);
-//			System.out.println("access time " + duration / 1000000.0);
-//	//	}
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					new Test();
-				}
-			});
+
+		t = new PivotalTrie("c:\\data\\author.data");
+
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new Test();
+			}
+		});
 	}
 
 }

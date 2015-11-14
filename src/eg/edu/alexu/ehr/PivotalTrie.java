@@ -3,37 +3,18 @@ package eg.edu.alexu.ehr;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
 public class PivotalTrie extends Trie {
 	static boolean verbose = false;
-
-	static class PivotalActiveNode implements Comparable<PivotalActiveNode> {
-		BasicTrieNode node = null;
-		int tau_px = 0;
-		String pi = "";
-		int tau_pi = 0;
-
-		PivotalActiveNode(BasicTrieNode r) {
-			node = r;
-		}
-
-		@Override
-		public String toString() {
-			return "(" + node.id + "," + tau_px + "," + pi + "," + tau_pi + ")";
-		}
-
-		@Override
-		public int compareTo(PivotalActiveNode o) {
-			return Integer.compare(node.getID(), o.node.getID());
-		}
-	}
 
 	static void write(String s) {
 		System.out.print(s);
@@ -44,7 +25,7 @@ public class PivotalTrie extends Trie {
 	}
 
 	public PivotalTrie(String filename) {
-		super(filename, true);
+		super(filename, false);
 	}
 
 	void updatePivotal(Map<BasicTrieNode, PivotalActiveNode> activenodes, PivotalActiveNode pnew) {
@@ -117,7 +98,40 @@ public class PivotalTrie extends Trie {
 		return new TrieNode(v, ch);
 	}
 
-	public List<String> matchPrefix(String query, int tau) {
+	public Map<BasicTrieNode, PivotalActiveNode> matchPrefixInc(String newquery, String previousquery,
+			Map<BasicTrieNode, PivotalActiveNode> pactivenodes, int tau) {
+		if ((newquery.length() > 1) && (previousquery.equals(newquery.substring(0, newquery.length() - 1)))) {
+				return ICPAN(newquery, pactivenodes, tau);
+		} else {
+			return matchPrefix(newquery, tau);
+		}
+	}
+
+	public Set<String> GetStrings(Map<BasicTrieNode, PivotalActiveNode> nodes, int k) {
+		// sorting the nodes based on tau_px
+
+		List<PivotalActiveNode> sorted_nodes = new Vector<>();
+		sorted_nodes.addAll(nodes.values());
+
+		Collections.sort(sorted_nodes);
+		Set<String> strings = new HashSet();
+		for (PivotalActiveNode p : sorted_nodes) {
+			TrieNode n = (TrieNode) p.node;
+			for (int i = n.rID.min; i <= n.rID.max; i++) {
+				// System.out.println(dictionary.get(i)+"@"+p.tau_px);
+				String s = dictionary.get(i);
+				if (!strings.contains(s)) {
+					strings.add(s);
+					if (strings.size() > k)
+						break;
+				}
+
+			}
+		}
+		return strings;
+	}
+
+	public Map<BasicTrieNode, PivotalActiveNode> matchPrefix(String query, int tau) {
 		Map<BasicTrieNode, PivotalActiveNode> activenodes = new HashMap<>();
 		activenodes.put(root, new PivotalActiveNode(root));
 		String px = "";
@@ -125,27 +139,7 @@ public class PivotalTrie extends Trie {
 			px = px + ch;
 			activenodes = ICPAN(px, activenodes, tau);
 		}
-		// now retrive these strings
-
-		HashMap<String, Integer> strings = new HashMap<String, Integer>();
-		List<String> sim = new Vector<>();
-		for (PivotalActiveNode p : activenodes.values()) {
-			TrieNode n = (TrieNode) p.node;
-			for (int i = n.rID.min; i <= n.rID.max; i++) {
-				// System.out.println(dictionary.get(i)+"@"+p.tau_px);
-				if (!strings.containsKey(dictionary.get(i)))
-					strings.put(dictionary.get(i), p.tau_px);
-
-			}
-		}
-		
-		//System.out.println(strings.entrySet());
-		TreeMap<String, Integer> sortedMap = SortByValue(strings);  
-		//System.out.println(sortedMap.entrySet());
-		sim.addAll(sortedMap.keySet());
-	
-
-		return sim;
+		return activenodes;
 	}
 
 	public static TreeMap<String, Integer> SortByValue(HashMap<String, Integer> map) {
@@ -166,7 +160,7 @@ class ValueComparator implements Comparator<String> {
 	}
 
 	public int compare(String a, String b) {
-		if (map.get(a)<= map.get(b)) {
+		if (map.get(a) <= map.get(b)) {
 			return -1;
 		} else {
 			return 1;

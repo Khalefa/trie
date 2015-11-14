@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -23,15 +24,19 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import eg.edu.alexu.ehr.*;
+import eg.edu.alexu.ehr.PivotalActiveNode;
 
 class AutoSuggestor {
-
+	final int tau = 2;
+	final int k = 50;
 	private final JTextField textField;
 	private final Window container;
 	private JPanel suggestionsPanel;
 	private JWindow autoSuggestionPopUpWindow;
 	private String typedWord;
-	//private  FuzzyTrie trie;
+	private String previousWord = "";
+	private Map<BasicTrieNode, PivotalActiveNode> activenodes = null;
+	// private FuzzyTrie trie;
 	private PivotalTrie trie;
 	private int currentIndexOfSpace, tW, tH;
 	private DocumentListener documentListener = new DocumentListener() {
@@ -53,15 +58,15 @@ class AutoSuggestor {
 	private final Color suggestionsTextColor;
 	private final Color suggestionFocusedColor;
 
-	public AutoSuggestor(JTextField textField, Window mainWindow, PivotalTrie t, Color popUpBackground,
-			Color textColor, Color suggestionFocusedColor, float opacity) {
+	public AutoSuggestor(JTextField textField, Window mainWindow, PivotalTrie t, Color popUpBackground, Color textColor,
+			Color suggestionFocusedColor, float opacity) {
 		this.textField = textField;
 		this.suggestionsTextColor = textColor;
 		this.container = mainWindow;
 		this.suggestionFocusedColor = suggestionFocusedColor;
 		this.textField.getDocument().addDocumentListener(documentListener);
 
-		trie=t;
+		trie = t;
 
 		typedWord = "";
 		currentIndexOfSpace = 0;
@@ -188,25 +193,20 @@ class AutoSuggestor {
 		 * (Exception e) { // TODO Auto-generated catch block
 		 * e.printStackTrace(); }
 		 */
-		//Map<String,Double> M = null;//trie.GetSimilarStrings(typedWord, 10);
-		List<String> M=trie.matchPrefix(typedWord,2);
-	
-		if (M.size() == 0) {
+		// Map<String,Double> M = null;//trie.GetSimilarStrings(typedWord, 10);
 
+		activenodes = trie.matchPrefixInc(typedWord, previousWord, activenodes, tau);
+		Set<String> candidates = trie.GetStrings(activenodes, k);
+		previousWord=typedWord;
+		if (candidates.size() == 0) {
 			if (autoSuggestionPopUpWindow.isVisible()) {
 				autoSuggestionPopUpWindow.setVisible(false);
 			}
 		} else {
-			if (M.size()<=50){
-			for (int t =0; t < M.size(); t++) {
-				addWordToSuggestions(M.get(t));
+			for (String s : candidates) {
+				addWordToSuggestions(s);
 			}
-			}
-			else{
-				for (int t =0; t <50; t++) {
-					addWordToSuggestions(M.get(t));
-				}
-			}
+
 			showPopUpWindow();
 			setFocusToTextField();
 		}
@@ -271,7 +271,6 @@ class AutoSuggestor {
 	}
 
 	// see1
-	
 
 	public JWindow getAutoSuggestionPopUpWindow() {
 		return autoSuggestionPopUpWindow;
@@ -285,8 +284,6 @@ class AutoSuggestor {
 		return textField;
 	}
 
-
-	
 }
 
 class SuggestionLabel extends JLabel {
