@@ -1,3 +1,4 @@
+
 import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -27,7 +28,7 @@ public class Test {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JTextField f = new JTextField(10);
-		AutoSuggestor autoSuggestor = new AutoSuggestor(f, frame, (FuzzyTrie) t, Color.WHITE.brighter(), Color.BLUE,
+		AutoSuggestor autoSuggestor = new AutoSuggestor(f, frame, (PivotalTrie) t, Color.WHITE.brighter(), Color.BLUE,
 				Color.RED, 0.75f);
 		JPanel p = new JPanel();
 		p.add(f);
@@ -59,25 +60,32 @@ public class Test {
 	}
 
 	public static void main(String[] args) {
-		// testTopk();
-		long startTime = System.nanoTime();
-		PivotalTrie t = new PivotalTrie("c:\\data\\test.data");
-		System.out.println(t);
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
-		System.out.println("build time " + duration / 1000000.0);
-
-		// System.out.println(t.toString());
-		//for (int i = 0; i <= 5; i++) {
-		int i=2;	
-		System.err.println("******" + i + "******");
-			startTime = System.nanoTime();
-			t.matchPrefix("nlis", i);
-			endTime = System.nanoTime();
-			duration = (endTime - startTime);
-			System.out.println("access time " + duration / 1000000.0);
-	//	}
-
+//		// testTopk();
+	//long startTime = System.nanoTime();
+	 t = new PivotalTrie("author.data");
+		
+////System.out.println(t);
+//		long endTime = System.nanoTime();
+//		long duration = (endTime - startTime);
+//		System.out.println("build time " + duration / 1000000.0);
+//
+//		// System.out.println(t.toString());
+//		//for (int i = 0; i <= 5; i++) {
+//		int i=3;	
+//		System.err.println("******" + i + "******");
+//			startTime = System.nanoTime();
+//			List<String> M=((PivotalTrie) t).matchPrefix("nlis", i);
+//			
+//			endTime = System.nanoTime();
+//			duration = (endTime - startTime);
+//			System.out.println("access time " + duration / 1000000.0);
+//	//	}
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					new Test();
+				}
+			});
 	}
 
 }
