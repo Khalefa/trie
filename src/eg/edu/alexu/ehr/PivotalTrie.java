@@ -1,16 +1,11 @@
 package eg.edu.alexu.ehr;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Vector;
 
 public class PivotalTrie extends Trie {
@@ -43,7 +38,6 @@ public class PivotalTrie extends Trie {
 	Map<BasicTrieNode, PivotalActiveNode> ICPAN(String px, Map<BasicTrieNode, PivotalActiveNode> cparentActiveNodes,
 			int tau) {
 
-		long startTime = System.nanoTime();
 		Map<BasicTrieNode, PivotalActiveNode> activenodes = new HashMap<>();
 		for (PivotalActiveNode pn : cparentActiveNodes.values()) {
 			// deletion
@@ -72,24 +66,7 @@ public class PivotalTrie extends Trie {
 			}
 
 		}
-		long endTime = System.nanoTime();
-		long duration = endTime - startTime;
-		int count = 0;
-		for (PivotalActiveNode p : activenodes.values()) {
-			{
-				TrieNode n = (TrieNode) p.node;
-				count += n.rID.max - n.rID.min + 1;
-			}
-		}
-		// writeln("Activenode size=" + activenodes.size()+"\t"+
-		// duration/1000.0/1000.0+" count = "+count);
-
-		if (verbose) {
-			for (PivotalActiveNode p : activenodes.values()) {
-				// writeln(p.toString());
-
-			}
-		}
+				
 		return activenodes;
 	}
 
@@ -107,28 +84,30 @@ public class PivotalTrie extends Trie {
 		}
 	}
 
-	public Set<String> GetStrings(Map<BasicTrieNode, PivotalActiveNode> nodes, int k) {
+	public List<String> GetStrings(Map<BasicTrieNode, PivotalActiveNode> nodes, int k) {
 		// sorting the nodes based on tau_px
 
 		List<PivotalActiveNode> sorted_nodes = new Vector<>();
 		sorted_nodes.addAll(nodes.values());
-
+	
 		Collections.sort(sorted_nodes);
-		Set<String> strings = new HashSet();
+		
+		Set<String> strings = new HashSet<>();
+		List<String> sim=new Vector<>();
 		for (PivotalActiveNode p : sorted_nodes) {
 			TrieNode n = (TrieNode) p.node;
 			for (int i = n.rID.min; i <= n.rID.max; i++) {
-				// System.out.println(dictionary.get(i)+"@"+p.tau_px);
 				String s = dictionary.get(i);
 				if (!strings.contains(s)) {
 					strings.add(s);
+					sim.add(s);
 					if (strings.size() > k)
 						break;
 				}
 
 			}
 		}
-		return strings;
+		return sim;
 	}
 
 	public Map<BasicTrieNode, PivotalActiveNode> matchPrefix(String query, int tau) {
@@ -142,28 +121,7 @@ public class PivotalTrie extends Trie {
 		return activenodes;
 	}
 
-	public static TreeMap<String, Integer> SortByValue(HashMap<String, Integer> map) {
-		ValueComparator vc = new ValueComparator(map);
-		TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>(vc);
-		sortedMap.putAll(map);
-		return sortedMap;
-	}
+	
 
 }
 
-class ValueComparator implements Comparator<String> {
-
-	Map<String, Integer> map;
-
-	public ValueComparator(Map<String, Integer> base) {
-		this.map = base;
-	}
-
-	public int compare(String a, String b) {
-		if (map.get(a) <= map.get(b)) {
-			return -1;
-		} else {
-			return 1;
-		} // returning 0 would merge keys
-	}
-}
