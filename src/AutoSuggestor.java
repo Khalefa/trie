@@ -36,7 +36,6 @@ class AutoSuggestor {
 	private String typedWord;
 	private String previousWord = "";
 	private Map<BasicTrieNode, PivotalActiveNode> activenodes = null;
-	// private FuzzyTrie trie;
 	private PivotalTrie trie;
 	private int currentIndexOfSpace, tW, tH;
 	private DocumentListener documentListener = new DocumentListener() {
@@ -88,9 +87,7 @@ class AutoSuggestor {
 				"Down released");
 		textField.getActionMap().put("Down released", new AbstractAction() {
 			@Override
-			public void actionPerformed(ActionEvent ae) {// focuses the first
-															// label on
-															// popwindow
+			public void actionPerformed(ActionEvent ae) {
 				for (int i = 0; i < suggestionsPanel.getComponentCount(); i++) {
 					if (suggestionsPanel.getComponent(i) instanceof SuggestionLabel) {
 						((SuggestionLabel) suggestionsPanel.getComponent(i)).setFocused(true);
@@ -109,11 +106,7 @@ class AutoSuggestor {
 			int lastFocusableIndex = 0;
 
 			@Override
-			public void actionPerformed(ActionEvent ae) {// allows scrolling of
-															// labels in pop
-															// window (I know
-															// very hacky for
-															// now :))
+			public void actionPerformed(ActionEvent ae) {
 
 				ArrayList<SuggestionLabel> sls = getAddedSuggestionLabels();
 				int max = sls.size();
@@ -127,13 +120,7 @@ class AutoSuggestor {
 								sl.setFocused(false);
 								autoSuggestionPopUpWindow.setVisible(false);
 								setFocusToTextField();
-								checkForAndShowSuggestions();// fire method as
-																// if document
-																// listener
-																// change
-																// occured and
-																// fired it
-
+								checkForAndShowSuggestions();
 							} else {
 								sl.setFocused(false);
 								lastFocusableIndex = i;
@@ -182,21 +169,13 @@ class AutoSuggestor {
 	private void checkForAndShowSuggestions() {
 		typedWord = getCurrentlyTypedWord();
 
-		suggestionsPanel.removeAll();// remove previous words/jlabels that were
-										// added
+		suggestionsPanel.removeAll();
 
-		// used to calcualte size of JWindow as new Jlabels are added
 		tW = 0;
 		tH = 0;
-		/*
-		 * boolean added = false; try { added = wordTyped(typedWord); } catch
-		 * (Exception e) { // TODO Auto-generated catch block
-		 * e.printStackTrace(); }
-		 */
-		// Map<String,Double> M = null;//trie.GetSimilarStrings(typedWord, 10);
-
+		
 		activenodes = trie.matchPrefixInc(typedWord, previousWord, activenodes, tau);
-		Set<String> candidates = trie.GetStrings(activenodes, k);
+		List<String> candidates = trie.GetStrings(activenodes, k);
 		previousWord=typedWord;
 		if (candidates.size() == 0) {
 			if (autoSuggestionPopUpWindow.isVisible()) {

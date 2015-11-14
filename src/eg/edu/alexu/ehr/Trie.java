@@ -1,8 +1,6 @@
 package eg.edu.alexu.ehr;
 
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

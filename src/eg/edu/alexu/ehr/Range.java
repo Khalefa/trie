@@ -1,13 +1,7 @@
 package eg.edu.alexu.ehr;
 
-import java.util.Collection;
-import java.util.Collections;
+
 import java.util.Comparator;
-import java.util.List;
-import java.util.Queue;
-import java.util.Vector;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 
 public class Range implements Comparator<Range>, Comparable<Range> {
 	int min;
