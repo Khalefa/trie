@@ -32,7 +32,7 @@ public class BasicTrieNode {
 		fromParent = x;// holding current node character
 	}
 
-	public Map<BasicTrieNode, IDistanceMetric> getLeafs(IDistanceMetric dist) {
+	public Map<BasicTrieNode, IDistance> getLeafs(IDistance dist) {
 		class pair {
 			public BasicTrieNode n;
 			public int depth;
@@ -42,7 +42,7 @@ public class BasicTrieNode {
 				this.depth = depth;
 			}
 		}
-		Map<BasicTrieNode, IDistanceMetric> leafs = new HashMap<BasicTrieNode, IDistanceMetric>();
+		Map<BasicTrieNode, IDistance> leafs = new HashMap<BasicTrieNode, IDistance>();
 		ArrayList<pair> queue = new ArrayList<pair>();
 		queue.add(new pair(this, 0));
 		if (leaf)
@@ -51,7 +51,7 @@ public class BasicTrieNode {
 			pair p = queue.remove(0);
 			for (BasicTrieNode c : p.n.children.values()) {
 				if (c.leaf)
-					leafs.put(c, new ED(p.depth + 1 + (int) dist.GetDistance()));
+					leafs.put(c, new ED(p.depth + 1 + dist.getDistance()));
 				queue.add(new pair(c, p.depth + 1));
 			}
 		}
@@ -69,7 +69,6 @@ public class BasicTrieNode {
 	}
 
 	void getDescendant(List<BasicTrieNode> descendents, int limit, char ch) {
-		
 		for (char c : children.keySet()) {
 			children.get(c).getDescendants(descendents, 1, limit, ch);
 		}

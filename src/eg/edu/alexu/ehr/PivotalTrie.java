@@ -64,7 +64,6 @@ public class PivotalTrie extends Trie {
 					updatePivotal(activenodes, match);
 				}
 			}
-
 		}
 				
 		return activenodes;
@@ -104,7 +103,6 @@ public class PivotalTrie extends Trie {
 					if (strings.size() > k)
 						break;
 				}
-
 			}
 		}
 		return sim;
@@ -120,8 +118,5 @@ public class PivotalTrie extends Trie {
 		}
 		return activenodes;
 	}
-
-	
-
 }
 
