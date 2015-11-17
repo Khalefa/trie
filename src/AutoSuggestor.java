@@ -35,8 +35,8 @@ class AutoSuggestor {
 	private JWindow autoSuggestionPopUpWindow;
 	private String typedWord;
 	private String previousWord = "";
-	private Map<BasicTrieNode, PivotalActiveNode> activenodes = null;
-	private PivotalTrie trie;
+	private Map<BasicTrieNode, ActiveNode> activenodes = null;
+	private FuzzyTrie trie;
 	private int currentIndexOfSpace, tW, tH;
 	private DocumentListener documentListener = new DocumentListener() {
 		@Override
@@ -57,7 +57,7 @@ class AutoSuggestor {
 	private final Color suggestionsTextColor;
 	private final Color suggestionFocusedColor;
 
-	public AutoSuggestor(JTextField textField, Window mainWindow, PivotalTrie t, Color popUpBackground, Color textColor,
+	public AutoSuggestor(JTextField textField, Window mainWindow, FuzzyTrie t, Color popUpBackground, Color textColor,
 			Color suggestionFocusedColor, float opacity) {
 		this.textField = textField;
 		this.suggestionsTextColor = textColor;
@@ -173,10 +173,10 @@ class AutoSuggestor {
 
 		tW = 0;
 		tH = 0;
-		
-		activenodes = trie.matchPrefixInc(typedWord, previousWord, activenodes, tau);
-		List<String> candidates = trie.GetStrings(activenodes, k);
-		previousWord=typedWord;
+
+		activenodes = trie.matchInc(typedWord, previousWord, activenodes, tau);
+		List<String> candidates = trie.getStrings(activenodes, true, k);
+		previousWord = typedWord;
 		if (candidates.size() == 0) {
 			if (autoSuggestionPopUpWindow.isVisible()) {
 				autoSuggestionPopUpWindow.setVisible(false);

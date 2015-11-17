@@ -22,7 +22,6 @@ public class BasicTrieNode {
 	}
 
 	void adjust(int id, int len, float prob) {
-
 	}
 
 	public BasicTrieNode(BasicTrieNode p, char x) {
@@ -76,11 +75,11 @@ public class BasicTrieNode {
 
 	@Override
 	public String toString() {
-		return "BTN[" + id + "]" + "\n";
+		return "BTN[" + id + "]" + leaf;
 	}
 
 	public String toString(int l) {
-		String s = this.toString();
+		String s = this.toString() + "\n";
 		String tabs = "";
 		for (int k = 0; k < l; k++)
 			tabs = tabs + "\t";

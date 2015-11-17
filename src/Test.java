@@ -12,27 +12,30 @@ import eg.edu.alexu.ehr.*;
  */
 public class Test {
 
-//	public Test() {
-//		JFrame frame = new JFrame();
-//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		JTextField f = new JTextField(10);
-//	AutoSuggestor autoSuggestor = new AutoSuggestor(f, frame,  t, Color.WHITE.brighter(), Color.BLUE,
-//				Color.RED, 0.75f);
-//		JPanel p = new JPanel();
-//		p.add(f);
-//		frame.add(p);
-//		frame.pack();
-//		frame.setVisible(true);
-//	}
+	public Test() {
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JTextField f = new JTextField(10);
+		AutoSuggestor autoSuggestor = new AutoSuggestor(f, frame, t, Color.WHITE.brighter(), Color.BLUE, Color.RED,
+				0.75f);
+		JPanel p = new JPanel();
+		p.add(f);
+		frame.add(p);
+		frame.pack();
+		frame.setVisible(true);
+	}
 
 	static FuzzyTrie t;
 
 	public static void main(String[] args) {
 
-		t = new FuzzyTrie("c:\\data\\author.data");
-		for(String s:t.matchString("mohamed_e", 2))
-			System.out.println(s);
-	
+		t = new PivotalTrie("c:\\data\\test.data");
+		 System.out.println(t.toString());
+		 for (String s : t.getFuzzyStrings("nlis", 2))
+		 System.err.println(s);
+		 System.out.println("*************************************");
+		 for (String s : t.getFuzzyPrefix("nlis", 2))
+		 System.err.println(s);
 //		SwingUtilities.invokeLater(new Runnable() {
 //			@Override
 //			public void run() {
