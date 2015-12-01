@@ -22,6 +22,7 @@ public class BasicTrieNode {
 	}
 
 	void adjust(int id, int len, float prob) {
+
 	}
 
 	public BasicTrieNode(BasicTrieNode p, char x) {
@@ -31,7 +32,7 @@ public class BasicTrieNode {
 		fromParent = x;// holding current node character
 	}
 
-	public Map<BasicTrieNode, IDistance> getLeafs(IDistance dist) {
+	public Map<BasicTrieNode, IDistanceMetric> getLeafs(IDistanceMetric dist) {
 		class pair {
 			public BasicTrieNode n;
 			public int depth;
@@ -41,7 +42,7 @@ public class BasicTrieNode {
 				this.depth = depth;
 			}
 		}
-		Map<BasicTrieNode, IDistance> leafs = new HashMap<BasicTrieNode, IDistance>();
+		Map<BasicTrieNode, IDistanceMetric> leafs = new HashMap<BasicTrieNode, IDistanceMetric>();
 		ArrayList<pair> queue = new ArrayList<pair>();
 		queue.add(new pair(this, 0));
 		if (leaf)
@@ -50,7 +51,7 @@ public class BasicTrieNode {
 			pair p = queue.remove(0);
 			for (BasicTrieNode c : p.n.children.values()) {
 				if (c.leaf)
-					leafs.put(c, new ED(p.depth + 1 + dist.getDistance()));
+					leafs.put(c, new ED(p.depth + 1 + (int) dist.GetDistance()));
 				queue.add(new pair(c, p.depth + 1));
 			}
 		}
@@ -68,6 +69,7 @@ public class BasicTrieNode {
 	}
 
 	void getDescendant(List<BasicTrieNode> descendents, int limit, char ch) {
+		
 		for (char c : children.keySet()) {
 			children.get(c).getDescendants(descendents, 1, limit, ch);
 		}
@@ -75,11 +77,11 @@ public class BasicTrieNode {
 
 	@Override
 	public String toString() {
-		return "BTN[" + id + "]" + leaf;
+		return "BTN[" + id + "]" + "\n";
 	}
 
 	public String toString(int l) {
-		String s = this.toString() + "\n";
+		String s = this.toString();
 		String tabs = "";
 		for (int k = 0; k < l; k++)
 			tabs = tabs + "\t";

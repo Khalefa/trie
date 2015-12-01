@@ -9,7 +9,10 @@ import java.io.InputStreamReader;
 public class Trie {
 
 	boolean looked = false;
-	Map<Integer, String> dictionary = new HashMap<Integer, String>();
+	public static Map<Integer, String> dictionary = new HashMap<Integer, String>();
+	public  Map<String, List<Integer>> inverted_list = new HashMap<>();
+	public static  Map<Integer, List<Integer>> forward = new HashMap<>();
+//	public static  List<String> words = new Vector<>();
 	List<Integer> sorted_id = null;
 	BasicTrieNode root = null;
 
@@ -35,6 +38,7 @@ public class Trie {
 		if (looked)
 			return null;
 		dictionary.put(id, s);
+		//System.out.println(id+s);
 		BasicTrieNode v = root;
 		int d = 1;
 		v.adjust(id, len, prob);
@@ -87,35 +91,95 @@ public class Trie {
 	}
 
 	private List<String> readandsortFile(String fileName) {
+		List<String> words=new Vector<>();
+		int linenumber = 0;
 		try {
-			List<String> lines = new Vector<String>();
+
 			File file = new File(fileName);
 			FileInputStream fIn = new FileInputStream(file);
 			BufferedReader in = new BufferedReader(new InputStreamReader(fIn));
+			List<Integer> records = new Vector<>();
 
 			while (true) {
 				String line = in.readLine();
+
 				if (line == null || line.equals(""))
 					break;
-				lines.add(line);
+				linenumber++;
+
+				String[] ll = line.split(" ");
+				for (String l : ll) {
+					if (inverted_list.get(l) == null) {
+						records = new Vector<>();
+						records.add(linenumber);
+						inverted_list.put(l, records);
+					} else {
+						records = inverted_list.get(l);
+						records.add(linenumber);
+					}
+
+				}
 			}
-			in.close();
-			Collections.sort(lines);
-			return lines;
+			
+			for (String g : inverted_list.keySet()) {
+				// System.out.println(g+inverted_list.get(g));
+				words.add(g);
+			}
+	
+			Collections.sort(words);
+//			 for (String d:words)
+//			 System.out.println("up"+d+":"+( words.indexOf(d)+1));
+			
+			// forward list
+
+			fIn.getChannel().position(0);
+			in = new BufferedReader(new InputStreamReader(fIn));
+			linenumber=0;
+			while (true) {
+				String line = in.readLine();
+				
+				if (line == null || line.equals(""))
+					break;
+				linenumber++;
+		
+				String[] ll = line.split(" ");
+				List<Integer> word_ID = new Vector<>();
+				for (String s:ll)
+				{
+					if(forward.get(linenumber)==null){
+						word_ID = new Vector<>();
+						word_ID.add(words.indexOf(s) + 1);
+				forward.put(linenumber,word_ID);
+					}
+					else{
+						word_ID = forward.get(linenumber);
+						word_ID.add(words.indexOf(s) + 1);
+					}
+				}
+			}
+			//
+//			 for (int g:forward.keySet()){
+//			 System.out.println(g+" :"+forward.get(g));
+//			 }
+					in.close();
+			return words;
 		} catch (Exception e) {
 
 		}
 		return null;
 	}
-
+ 
 	private void Init(String fileName, boolean truncate) {
+		// word ID
 		int id = 0;
 		root = CreateTrieNode(null, '\0');
 		try {
-			List<String> lines = readandsortFile(fileName);
-			List<pair> pairs = new Vector<>(lines.size());
-			for (String line : lines) {
-				String[] inputS = line.split("\t");
+			List<String> wrds = readandsortFile(fileName);
+		//	for(String s:lines)
+			///System.out.println(s);
+			List<pair> pairs = new Vector<>(wrds.size());
+			for (String wrd : wrds) {
+				String[] inputS = wrd.split("\t");
 				float prob = 1;
 				if (inputS.length > 1) {
 					prob = Float.parseFloat(inputS[1]);
@@ -127,8 +191,10 @@ public class Trie {
 					if (s.length() > 10)
 						s = s.substring(0, 10);
 				insertString(root, s, id, prob, l);
+
 				pairs.add(new pair(id, s));
 				id++;
+			
 			}
 			sortbyLength(pairs);
 		} catch (Exception e) {

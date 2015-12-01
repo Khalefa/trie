@@ -1,4 +1,5 @@
 
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -8,9 +9,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -24,20 +26,22 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import eg.edu.alexu.ehr.*;
-import eg.edu.alexu.ehr.PivotalActiveNode;
 
 class AutoSuggestor {
 	final int tau = 2;
-	final int k = 50;
+	final int k = 10;
 	private final JTextField textField;
 	private final Window container;
 	private JPanel suggestionsPanel;
 	private JWindow autoSuggestionPopUpWindow;
 	private String typedWord;
+	private String newtypedWord;
 	private String previousWord = "";
-	private Map<BasicTrieNode, ActiveNode> activenodes = null;
-	private FuzzyTrie trie;
-	private int currentIndexOfSpace, tW, tH;
+	private List<Integer> prev_invList = null;
+	private List<Integer> cur_invList;
+	private Map<BasicTrieNode, PivotalActiveNode> activenodes = null;
+	private PivotalTrie trie;
+	private int tW, tH;
 	private DocumentListener documentListener = new DocumentListener() {
 		@Override
 		public void insertUpdate(DocumentEvent de) {
@@ -57,7 +61,7 @@ class AutoSuggestor {
 	private final Color suggestionsTextColor;
 	private final Color suggestionFocusedColor;
 
-	public AutoSuggestor(JTextField textField, Window mainWindow, FuzzyTrie t, Color popUpBackground, Color textColor,
+	public AutoSuggestor(JTextField textField, Window mainWindow, PivotalTrie t, Color popUpBackground, Color textColor,
 			Color suggestionFocusedColor, float opacity) {
 		this.textField = textField;
 		this.suggestionsTextColor = textColor;
@@ -68,7 +72,9 @@ class AutoSuggestor {
 		trie = t;
 
 		typedWord = "";
-		currentIndexOfSpace = 0;
+
+		newtypedWord = "";
+
 		tW = 0;
 		tH = 0;
 
@@ -166,24 +172,78 @@ class AutoSuggestor {
 	}
 
 	// Edit here
-	private void checkForAndShowSuggestions() {
-		typedWord = getCurrentlyTypedWord();
+	HashMap<Integer, List<Integer>> diffList = new HashMap<>();
 
+	List<Integer> incremental(String queryString, String previousQueryString) {
+		String prefix = Utils.getLastPrefix(queryString);
+		String old_prefix = Utils.getLastPrefix(previousQueryString);
+		activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
+
+		List<Integer> candidatesrecords = trie.getRecordsIDs(activenodes, k);
+		cur_invList = candidatesrecords;
+		if(Utils.verbose)
+		System.out
+				.println(cur_invList + "::::" + prev_invList + ">>>>" + Utils.intersectList(cur_invList, prev_invList));
+		if (prev_invList != null) {
+			List<Integer> intersection = Utils.intersectList(cur_invList, prev_invList);
+			cur_invList = intersection;
+			diffList.put(previousQueryString.length(), Utils.diffList(intersection, prev_invList));
+		}
+		prev_invList = cur_invList;
+		return cur_invList;
+	}
+
+	List<String> getRecordsString(List<Integer> ids) {
+		List<String> records = new Vector<>();
+		List<Integer> wordsID = new Vector<>();
+
+		for (int r : ids) {
+			String s = "";
+			wordsID = Trie.forward.get(r);
+			for (int w : wordsID) {
+				s = s + " " + Trie.dictionary.get(w - 1);
+			}
+			records.add(s);
+		}
+		return records;
+	}
+
+	private void checkForAndShowSuggestions() {
+		typedWord = textField.getText();
 		suggestionsPanel.removeAll();
 
 		tW = 0;
 		tH = 0;
+		List<Integer> candidaterecords = new Vector<>();
+		if(Utils.verbose)System.out.print("Typed word:" + typedWord + "\n");
+		if(Utils.verbose)System.out.print("Previous word:" + previousWord + "\n");
+		if (typedWord.startsWith(previousWord) && !typedWord.equals(previousWord)) {
+			// insertion
+			if(Utils.verbose)System.err.println("Insertion");
+			candidaterecords = incremental(typedWord, previousWord);
+		} else if (previousWord.startsWith(typedWord)) {
+			// deletion
+			if(Utils.verbose)System.err.println("deletion");
+			List<Integer> restored = new Vector<>();
+			if (typedWord.length() > 0)
+				for (int i = typedWord.length(); i < previousWord.length(); i++) {
+					restored.addAll(diffList.get(i));
+				}
 
-		activenodes = trie.matchInc(typedWord, previousWord, activenodes, tau);
-		List<String> candidates = trie.getStrings(activenodes, true, k);
+			candidaterecords = prev_invList = Utils.UnionList(prev_invList, restored);
+
+		}
+		if(Utils.verbose)	System.out.println("Candidaten" + candidaterecords);
+
 		previousWord = typedWord;
-		if (candidates.size() == 0) {
+		if (candidaterecords.size() == 0) {
 			if (autoSuggestionPopUpWindow.isVisible()) {
 				autoSuggestionPopUpWindow.setVisible(false);
 			}
 		} else {
-			for (String s : candidates) {
-				addWordToSuggestions(s);
+			List<String> candidateRecordString = getRecordsString(candidaterecords);
+			for (String word : candidateRecordString) {
+				addWordToSuggestions(word);
 			}
 
 			showPopUpWindow();
@@ -197,23 +257,6 @@ class AutoSuggestor {
 		calculatePopUpWindowSize(suggestionLabel);
 
 		suggestionsPanel.add(suggestionLabel);
-	}
-
-	public String getCurrentlyTypedWord() {// get newest word after last white
-											// spaceif any or the first word if
-											// no white spaces
-		String text = textField.getText();
-		String wordBeingTyped = "";
-		if (text.contains(" ")) {
-			int tmp = text.lastIndexOf(" ");
-			if (tmp >= currentIndexOfSpace) {
-				currentIndexOfSpace = tmp;
-				wordBeingTyped = text.substring(text.lastIndexOf(" "));
-			}
-		} else {
-			wordBeingTyped = text;
-		}
-		return wordBeingTyped.trim();
 	}
 
 	private void calculatePopUpWindowSize(JLabel label) {
@@ -328,7 +371,7 @@ class SuggestionLabel extends JLabel {
 	private void replaceWithSuggestedText() {
 		String suggestedWord = getText();
 		String text = textField.getText();
-		String typedWord = autoSuggestor.getCurrentlyTypedWord();
+		String typedWord = text;
 		String t = text.substring(0, text.lastIndexOf(typedWord));
 		String tmp = t + text.substring(text.lastIndexOf(typedWord)).replace(typedWord, suggestedWord);
 		textField.setText(tmp + " ");

@@ -1,5 +1,7 @@
 package eg.edu.alexu.ehr;
 
+
+
 public class TrieNode extends BasicTrieNode {
 
 	public TrieNode(BasicTrieNode p, char x) {
@@ -7,17 +9,20 @@ public class TrieNode extends BasicTrieNode {
 	}
 
 	Range rID;
+	
 
 	void adjust(int id, int len, float prob) {
 		if (rID == null)
 			rID = new Range(id, id);
 		else
 			rID.extend(id);
+		
+		
 	}
 
 	@Override
 	public String toString() {
-		return "TN[" + id + "] " + leaf + " R:" + rID;
+		return "TN[" + id + "] "+ " R:" + rID;
 	}
 
 }
