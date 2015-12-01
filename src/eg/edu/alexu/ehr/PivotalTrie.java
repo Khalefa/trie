@@ -110,14 +110,18 @@ public class PivotalTrie extends Trie {
 					strings.add(s);
 					recordsofsim = inverted_list.get(s);
 					for (int r : recordsofsim) {
-						if (!sim.contains(r))
+						if (!sim.contains(r)){
 							sim.add(r);
+							
+						}
 					}
+					
 					if (sim.size() > k)
-						return sim;
+						return sim;	
 				}
 
 			}
+			
 		}
 		return sim;
 	}

@@ -29,7 +29,7 @@ import eg.edu.alexu.ehr.*;
 
 class AutoSuggestor {
 	final int tau = 2;
-	final int k = 10;
+	final int k = 20;
 	private final JTextField textField;
 	private final Window container;
 	private JPanel suggestionsPanel;
@@ -174,23 +174,34 @@ class AutoSuggestor {
 	// Edit here
 	HashMap<Integer, List<Integer>> diffList = new HashMap<>();
 
-	List<Integer> incremental(String queryString, String previousQueryString) {
+	List<Integer> incremental(String queryString, String previousQueryString,int t) {
+	
+		
 		String prefix = Utils.getLastPrefix(queryString);
+		
 		String old_prefix = Utils.getLastPrefix(previousQueryString);
+		
 		activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
 
 		List<Integer> candidatesrecords = trie.getRecordsIDs(activenodes, k);
-		cur_invList = candidatesrecords;
+		
+		
+		cur_invList=candidatesrecords ;
 		if(Utils.verbose)
-		System.out
-				.println(cur_invList + "::::" + prev_invList + ">>>>" + Utils.intersectList(cur_invList, prev_invList));
-		if (prev_invList != null) {
+		System.out.println(cur_invList + "::::" + prev_invList + ">>>>" + Utils.intersectList(cur_invList, prev_invList));
+		
+		if ((prev_invList != null)&& t>1) {
+			
 			List<Integer> intersection = Utils.intersectList(cur_invList, prev_invList);
 			cur_invList = intersection;
+			
 			diffList.put(previousQueryString.length(), Utils.diffList(intersection, prev_invList));
 		}
+		
 		prev_invList = cur_invList;
+		
 		return cur_invList;
+		
 	}
 
 	List<String> getRecordsString(List<Integer> ids) {
@@ -207,31 +218,40 @@ class AutoSuggestor {
 		}
 		return records;
 	}
-
+	String [] allwords=null;
+	int t=0;
 	private void checkForAndShowSuggestions() {
 		typedWord = textField.getText();
 		suggestionsPanel.removeAll();
-
+      allwords=typedWord.split(" ");
+      t=allwords.length;
 		tW = 0;
 		tH = 0;
 		List<Integer> candidaterecords = new Vector<>();
 		if(Utils.verbose)System.out.print("Typed word:" + typedWord + "\n");
 		if(Utils.verbose)System.out.print("Previous word:" + previousWord + "\n");
-		if (typedWord.startsWith(previousWord) && !typedWord.equals(previousWord)) {
+		typedWord=typedWord.trim();
+		if ((typedWord.startsWith(previousWord))) {
 			// insertion
 			if(Utils.verbose)System.err.println("Insertion");
-			candidaterecords = incremental(typedWord, previousWord);
+			candidaterecords= incremental(typedWord, previousWord,t);
+			
 		} else if (previousWord.startsWith(typedWord)) {
 			// deletion
 			if(Utils.verbose)System.err.println("deletion");
 			List<Integer> restored = new Vector<>();
-			if (typedWord.length() > 0)
+			if (typedWord.length() > 0 && t>1){
 				for (int i = typedWord.length(); i < previousWord.length(); i++) {
 					restored.addAll(diffList.get(i));
 				}
 
-			candidaterecords = prev_invList = Utils.UnionList(prev_invList, restored);
-
+			candidaterecords  =prev_invList= Utils.UnionList(prev_invList, restored);
+			
+			}
+			else{
+				candidaterecords=incremental(typedWord, previousWord,t);
+				
+			}
 		}
 		if(Utils.verbose)	System.out.println("Candidaten" + candidaterecords);
 

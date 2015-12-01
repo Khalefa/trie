@@ -28,7 +28,7 @@ public class Test {
 	static Trie t;
 
 	public static void main(String[] args) {
-		String []filename={"icd10cm edited.txt", "test.txt"};
+		String []filename={"icd10cm edited.txt", "test.txt","words.txt","test2.txt"};
     
 		t = new PivotalTrie(filename[0]);
 		SwingUtilities.invokeLater(new Runnable() {
