@@ -2,6 +2,7 @@ package eg.edu.alexu.ehr;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Vector;
 
 public class Utils {
@@ -25,6 +26,8 @@ public class Utils {
 	static public List<Integer> intersectList(List<Integer> cur_simi, List<Integer> prev_simi) {
 		if (prev_simi == null)
 			return cur_simi;
+//		if(prev_simi.size()==0)
+//			return cur_simi;
 		List<Integer> shorter = cur_simi;
 		List<Integer> longer = prev_simi;
 		if (shorter.size() > longer.size()) {
@@ -47,7 +50,9 @@ public class Utils {
 
 	static public List<Integer> diffList(List<Integer> intersect, List<Integer> prev_list) {
 		if (prev_list == null)
-			return intersect;
+			return  intersect;
+		if(intersect==null)
+			return prev_list;
 		List<Integer> diff_records = new Vector<>(prev_list);
 		diff_records.removeAll(intersect);
 
@@ -57,7 +62,7 @@ public class Utils {
 	static public List<Integer> UnionList(List<Integer> a, List<Integer> b) {
 		if (a == null)
 			return new Vector<>(b);
-		if(b==null) return new Vector<>(a);
+		if(b==null) return  new Vector<>(a);
 		
 		List<Integer> union = new Vector<>(a);
 		HashSet<Integer> exists=new HashSet<>(a);
@@ -70,5 +75,20 @@ public class Utils {
 
 	}
 	public static boolean verbose=false;
+	public static boolean verbose1=false;
+	public static boolean verbose2=false;
+	public static String normalize(String raw) {
+		
+		raw=raw.replaceAll("[\\\"-+.^:,*_$%#@\\[\\]/]", "");
+		if(raw.length()==0)return  "";
+		StringBuilder sb = new StringBuilder();
+		Scanner scanner = new Scanner(raw);
 
+		while (scanner.hasNext()) {
+			sb.append(scanner.next());
+			sb.append(' ');
+		}
+		sb.deleteCharAt(sb.length() - 1);
+		return sb.toString().toLowerCase();
+	}
 }

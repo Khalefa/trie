@@ -1,5 +1,8 @@
 
 import java.awt.Color;
+import java.util.List;
+import java.util.Vector;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -28,9 +31,12 @@ public class Test {
 	static Trie t;
 
 	public static void main(String[] args) {
+		
 		String []filename={"icd10cm edited.txt", "test.txt","words.txt","test2.txt"};
     
-		t = new PivotalTrie(filename[0]);
+		t = new PivotalTrie("c:\\data\\Edit\\"+filename[0]);
+		
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

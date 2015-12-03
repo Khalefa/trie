@@ -91,17 +91,7 @@ public class Trie {
 		}
 	}
 
-	private String normalize(String raw) {
-		StringBuilder sb = new StringBuilder();
-		Scanner scanner = new Scanner(raw);
-
-		while (scanner.hasNext()) {
-			sb.append(scanner.next());
-			sb.append(' ');
-		}
-		sb.deleteCharAt(sb.length() - 1);
-		return sb.toString();
-	}
+	
 
 	private List<String> readandsortFile(String fileName) {
 		List<String> words = new Vector<>();
@@ -119,7 +109,7 @@ public class Trie {
 				if (line == null || line.equals(""))
 					break;
 				linenumber++;
-				line = normalize(line.replaceAll("[\\\"-+.^:,*_$%#@\\[\\]/]", "")).toLowerCase();
+				line = Utils.normalize(line);
 
 				//System.out.println(line);
 				String[] ll = line.split(" ");
@@ -156,7 +146,7 @@ public class Trie {
 				if (line == null || line.equals(""))
 					break;
 				linenumber++;
-				line = normalize(line.replaceAll("[\\\"-+.^:,*_$%#@\\[\\]/]", "")).toLowerCase();
+				line = Utils.normalize(line);
 				String[] ll = line.split(" ");
 				List<Integer> word_ID = new Vector<>();
 				for (String s : ll) {

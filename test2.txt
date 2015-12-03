@@ -1,6 +1,0 @@
-sarit,0.2
-seraji,4
-suijt,3
-suit,3
-surajit,3
-thrifty,3

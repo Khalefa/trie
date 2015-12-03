@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.rmi.CORBA.Util;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -29,7 +30,7 @@ import eg.edu.alexu.ehr.*;
 
 class AutoSuggestor {
 	final int tau = 2;
-	final int k = 20;
+	final int k = 1020;
 	private final JTextField textField;
 	private final Window container;
 	private JPanel suggestionsPanel;
@@ -37,8 +38,9 @@ class AutoSuggestor {
 	private String typedWord;
 	private String newtypedWord;
 	private String previousWord = "";
-	private List<Integer> prev_invList = null;
-	private List<Integer> cur_invList;
+	private List<Integer> prev_invList = null; // ew Vector<>();
+
+	private List<Integer> word_invList = null; // ew Vector<>();
 	private Map<BasicTrieNode, PivotalActiveNode> activenodes = null;
 	private PivotalTrie trie;
 	private int tW, tH;
@@ -160,6 +162,8 @@ class AutoSuggestor {
 		textField.requestFocusInWindow();
 	}
 
+	HashMap<Integer, List<Integer>> diffList = new HashMap<>();
+
 	public ArrayList<SuggestionLabel> getAddedSuggestionLabels() {
 		ArrayList<SuggestionLabel> sls = new ArrayList<>();
 		for (int i = 0; i < suggestionsPanel.getComponentCount(); i++) {
@@ -172,36 +176,72 @@ class AutoSuggestor {
 	}
 
 	// Edit here
-	HashMap<Integer, List<Integer>> diffList = new HashMap<>();
+	List<Integer> deletion(String queryString, String previousQueryString) {
 
-	List<Integer> incremental(String queryString, String previousQueryString,int t) {
-	
-		
+		List<Integer> cur_invList = new Vector<>();
+		int word_cnt = queryString.split(" ").length;
+		int previous_word_cnt = previousQueryString.split(" ").length;
+        if(word_cnt==0) return cur_invList;
+        
+		if (word_cnt == previous_word_cnt) {
+			String prefix = Utils.getLastPrefix(queryString);
+			String old_prefix = Utils.getLastPrefix(previousQueryString);
+
+			activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
+			List<Integer> candidatesrecords = trie.getRecordsIDs(activenodes, k);
+			cur_invList = Utils.intersectList(candidatesrecords, prev_invList);
+			word_invList = cur_invList;
+			if (Utils.verbose1)
+				System.out.println("back to " + word_invList);
+			return word_invList;
+
+		} else if (word_cnt < previous_word_cnt) {
+			List<Integer> restored = new Vector<>();
+				for (int i = word_cnt; i < previous_word_cnt; i++) {
+					restored.addAll(diffList.get(i));
+			}
+			word_invList = prev_invList;
+			if(word_cnt==1)
+				prev_invList=null;
+			else
+			prev_invList = Utils.UnionList(prev_invList, restored);
+			
+			if (Utils.verbose1) {
+				System.out.println("restored  to " + restored);
+				System.out.println("	prev_invList  to " + prev_invList);
+
+			}
+			return word_invList;
+		} else
+			return null;
+	}
+
+	List<Integer> incremental(String queryString, String previousQueryString) {
+		List<Integer> cur_invList = new Vector<>();
+
 		String prefix = Utils.getLastPrefix(queryString);
-		
 		String old_prefix = Utils.getLastPrefix(previousQueryString);
-		
-		activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
 
-		List<Integer> candidatesrecords = trie.getRecordsIDs(activenodes, k);
-		
-		
-		cur_invList=candidatesrecords ;
-		if(Utils.verbose)
-		System.out.println(cur_invList + "::::" + prev_invList + ">>>>" + Utils.intersectList(cur_invList, prev_invList));
-		
-		if ((prev_invList != null)&& t>1) {
-			
-			List<Integer> intersection = Utils.intersectList(cur_invList, prev_invList);
-			cur_invList = intersection;
-			
-			diffList.put(previousQueryString.length(), Utils.diffList(intersection, prev_invList));
+		int word_cnt = queryString.split(" ").length;
+		int previous_word_cnt = previousQueryString.split(" ").length;
+
+		if (word_cnt > previous_word_cnt) {
+			diffList.put(previous_word_cnt, Utils.diffList(word_invList, prev_invList));
+			prev_invList = word_invList;
 		}
-		
-		prev_invList = cur_invList;
-		
-		return cur_invList;
-		
+
+		activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
+		cur_invList = trie.getRecordsIDs(activenodes, k);
+		List<Integer> intersection = Utils.intersectList(cur_invList, prev_invList);
+
+		if (Utils.verbose1) {
+			int t = -1;
+			if (prev_invList != null)
+				t = prev_invList.size();
+			System.out.println(queryString + " " + cur_invList.size() + "::::" + t + ">>>>" + intersection.size());
+		}
+		word_invList = intersection;
+		return intersection;
 	}
 
 	List<String> getRecordsString(List<Integer> ids) {
@@ -218,43 +258,42 @@ class AutoSuggestor {
 		}
 		return records;
 	}
-	String [] allwords=null;
-	int t=0;
+
 	private void checkForAndShowSuggestions() {
-		typedWord = textField.getText();
+		
+		typedWord = Utils.normalize(textField.getText().trim());
 		suggestionsPanel.removeAll();
-      allwords=typedWord.split(" ");
-      t=allwords.length;
 		tW = 0;
 		tH = 0;
-		List<Integer> candidaterecords = new Vector<>();
-		if(Utils.verbose)System.out.print("Typed word:" + typedWord + "\n");
-		if(Utils.verbose)System.out.print("Previous word:" + previousWord + "\n");
-		typedWord=typedWord.trim();
-		if ((typedWord.startsWith(previousWord))) {
-			// insertion
-			if(Utils.verbose)System.err.println("Insertion");
-			candidaterecords= incremental(typedWord, previousWord,t);
-			
-		} else if (previousWord.startsWith(typedWord)) {
-			// deletion
-			if(Utils.verbose)System.err.println("deletion");
-			List<Integer> restored = new Vector<>();
-			if (typedWord.length() > 0 && t>1){
-				for (int i = typedWord.length(); i < previousWord.length(); i++) {
-					restored.addAll(diffList.get(i));
-				}
-
-			candidaterecords  =prev_invList= Utils.UnionList(prev_invList, restored);
-			
-			}
-			else{
-				candidaterecords=incremental(typedWord, previousWord,t);
-				
-			}
+		
+		if(typedWord.length()==0) {
+			HidePopUpWindow();			
+			return;
 		}
-		if(Utils.verbose)	System.out.println("Candidaten" + candidaterecords);
+		
+		if (typedWord.equals(previousWord))
+			return;
+		
 
+		List<Integer> candidaterecords = new Vector<>();
+
+		if (Utils.verbose)
+			System.out.print("Typed word:" + typedWord + "\n");
+		if (Utils.verbose)
+			System.out.print("Previous word:" + previousWord + "\n");
+
+		if (typedWord.startsWith(previousWord) && !typedWord.equals(previousWord)) {
+		
+			candidaterecords = incremental(typedWord, previousWord);
+
+		} else if (previousWord.startsWith(typedWord)) {
+	
+			candidaterecords = deletion(typedWord, previousWord);
+		}
+		if (Utils.verbose)
+			System.out.println("Candidaten" + candidaterecords);
+        if(Utils.verbose2)
+        	System.out.println(typedWord+"\t"+candidaterecords.size()+"\t"+ candidaterecords);
 		previousWord = typedWord;
 		if (candidaterecords.size() == 0) {
 			if (autoSuggestionPopUpWindow.isVisible()) {
@@ -287,6 +326,12 @@ class AutoSuggestor {
 		tH += label.getPreferredSize().height;
 	}
 
+	private void HidePopUpWindow(){
+		autoSuggestionPopUpWindow.setSize(tW, tH);
+		autoSuggestionPopUpWindow.setVisible(false);
+		autoSuggestionPopUpWindow.revalidate();
+		autoSuggestionPopUpWindow.repaint();
+	}
 	private void showPopUpWindow() {
 		autoSuggestionPopUpWindow.getContentPane().add(suggestionsPanel);
 		autoSuggestionPopUpWindow.setMinimumSize(new Dimension(textField.getWidth(), 30));
