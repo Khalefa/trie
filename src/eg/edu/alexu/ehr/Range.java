@@ -1,9 +1,10 @@
 package eg.edu.alexu.ehr;
 
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class Range implements Comparator<Range>, Comparable<Range> {
+public class Range implements Comparator<Range>, Comparable<Range>, Serializable {
 	int min;
 	int max;
 

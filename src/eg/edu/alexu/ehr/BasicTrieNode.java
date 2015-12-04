@@ -1,5 +1,6 @@
 package eg.edu.alexu.ehr;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-public class BasicTrieNode {
+public class BasicTrieNode implements Serializable{
 
 	static int counter = 0;
 	int id;
@@ -21,7 +22,7 @@ public class BasicTrieNode {
 		return id;
 	}
 
-	void adjust(int id, int len, float prob) {
+	void adjust(int id, int len) {
 
 	}
 

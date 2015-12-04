@@ -30,19 +30,11 @@ import eg.edu.alexu.ehr.*;
 
 class AutoSuggestor {
 	final int tau = 2;
-	final int k = 1020;
+	final int k = 10;
 	private final JTextField textField;
 	private final Window container;
 	private JPanel suggestionsPanel;
 	private JWindow autoSuggestionPopUpWindow;
-	private String typedWord;
-	private String newtypedWord;
-	private String previousWord = "";
-	private List<Integer> prev_invList = null; // ew Vector<>();
-
-	private List<Integer> word_invList = null; // ew Vector<>();
-	private Map<BasicTrieNode, PivotalActiveNode> activenodes = null;
-	private PivotalTrie trie;
 	private int tW, tH;
 	private DocumentListener documentListener = new DocumentListener() {
 		@Override
@@ -62,6 +54,7 @@ class AutoSuggestor {
 	};
 	private final Color suggestionsTextColor;
 	private final Color suggestionFocusedColor;
+	Matcher m;
 
 	public AutoSuggestor(JTextField textField, Window mainWindow, PivotalTrie t, Color popUpBackground, Color textColor,
 			Color suggestionFocusedColor, float opacity) {
@@ -71,12 +64,7 @@ class AutoSuggestor {
 		this.suggestionFocusedColor = suggestionFocusedColor;
 		this.textField.getDocument().addDocumentListener(documentListener);
 
-		trie = t;
-
-		typedWord = "";
-
-		newtypedWord = "";
-
+		m = new Matcher(t);
 		tW = 0;
 		tH = 0;
 
@@ -162,8 +150,6 @@ class AutoSuggestor {
 		textField.requestFocusInWindow();
 	}
 
-	HashMap<Integer, List<Integer>> diffList = new HashMap<>();
-
 	public ArrayList<SuggestionLabel> getAddedSuggestionLabels() {
 		ArrayList<SuggestionLabel> sls = new ArrayList<>();
 		for (int i = 0; i < suggestionsPanel.getComponentCount(); i++) {
@@ -175,134 +161,25 @@ class AutoSuggestor {
 		return sls;
 	}
 
-	// Edit here
-	List<Integer> deletion(String queryString, String previousQueryString) {
-
-		List<Integer> cur_invList = new Vector<>();
-		int word_cnt = queryString.split(" ").length;
-		int previous_word_cnt = previousQueryString.split(" ").length;
-        if(word_cnt==0) return cur_invList;
-        
-		if (word_cnt == previous_word_cnt) {
-			String prefix = Utils.getLastPrefix(queryString);
-			String old_prefix = Utils.getLastPrefix(previousQueryString);
-
-			activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
-			List<Integer> candidatesrecords = trie.getRecordsIDs(activenodes, k);
-			cur_invList = Utils.intersectList(candidatesrecords, prev_invList);
-			word_invList = cur_invList;
-			if (Utils.verbose1)
-				System.out.println("back to " + word_invList);
-			return word_invList;
-
-		} else if (word_cnt < previous_word_cnt) {
-			List<Integer> restored = new Vector<>();
-				for (int i = word_cnt; i < previous_word_cnt; i++) {
-					restored.addAll(diffList.get(i));
-			}
-			word_invList = prev_invList;
-			if(word_cnt==1)
-				prev_invList=null;
-			else
-			prev_invList = Utils.UnionList(prev_invList, restored);
-			
-			if (Utils.verbose1) {
-				System.out.println("restored  to " + restored);
-				System.out.println("	prev_invList  to " + prev_invList);
-
-			}
-			return word_invList;
-		} else
-			return null;
-	}
-
-	List<Integer> incremental(String queryString, String previousQueryString) {
-		List<Integer> cur_invList = new Vector<>();
-
-		String prefix = Utils.getLastPrefix(queryString);
-		String old_prefix = Utils.getLastPrefix(previousQueryString);
-
-		int word_cnt = queryString.split(" ").length;
-		int previous_word_cnt = previousQueryString.split(" ").length;
-
-		if (word_cnt > previous_word_cnt) {
-			diffList.put(previous_word_cnt, Utils.diffList(word_invList, prev_invList));
-			prev_invList = word_invList;
-		}
-
-		activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
-		cur_invList = trie.getRecordsIDs(activenodes, k);
-		List<Integer> intersection = Utils.intersectList(cur_invList, prev_invList);
-
-		if (Utils.verbose1) {
-			int t = -1;
-			if (prev_invList != null)
-				t = prev_invList.size();
-			System.out.println(queryString + " " + cur_invList.size() + "::::" + t + ">>>>" + intersection.size());
-		}
-		word_invList = intersection;
-		return intersection;
-	}
-
-	List<String> getRecordsString(List<Integer> ids) {
-		List<String> records = new Vector<>();
-		List<Integer> wordsID = new Vector<>();
-
-		for (int r : ids) {
-			String s = "";
-			wordsID = Trie.forward.get(r);
-			for (int w : wordsID) {
-				s = s + " " + Trie.dictionary.get(w - 1);
-			}
-			records.add(s);
-		}
-		return records;
-	}
-
 	private void checkForAndShowSuggestions() {
-		
-		typedWord = Utils.normalize(textField.getText().trim());
+
+		List<String> candidateRecordString = m.getCandidate(textField.getText());
+		if(candidateRecordString==null)return;
 		suggestionsPanel.removeAll();
-		tW = 0;
-		tH = 0;
-		
-		if(typedWord.length()==0) {
-			HidePopUpWindow();			
-			return;
-		}
-		
-		if (typedWord.equals(previousWord))
-			return;
-		
+			tW = 0;
+tH = 0;
 
-		List<Integer> candidaterecords = new Vector<>();
-
-		if (Utils.verbose)
-			System.out.print("Typed word:" + typedWord + "\n");
-		if (Utils.verbose)
-			System.out.print("Previous word:" + previousWord + "\n");
-
-		if (typedWord.startsWith(previousWord) && !typedWord.equals(previousWord)) {
-		
-			candidaterecords = incremental(typedWord, previousWord);
-
-		} else if (previousWord.startsWith(typedWord)) {
-	
-			candidaterecords = deletion(typedWord, previousWord);
-		}
-		if (Utils.verbose)
-			System.out.println("Candidaten" + candidaterecords);
-        if(Utils.verbose2)
-        	System.out.println(typedWord+"\t"+candidaterecords.size()+"\t"+ candidaterecords);
-		previousWord = typedWord;
-		if (candidaterecords.size() == 0) {
+		if (candidateRecordString.size() == 0) {
 			if (autoSuggestionPopUpWindow.isVisible()) {
 				autoSuggestionPopUpWindow.setVisible(false);
 			}
 		} else {
-			List<String> candidateRecordString = getRecordsString(candidaterecords);
+			int l = 0;
 			for (String word : candidateRecordString) {
 				addWordToSuggestions(word);
+				if (l > k)
+					break;
+				l++;
 			}
 
 			showPopUpWindow();
@@ -326,12 +203,13 @@ class AutoSuggestor {
 		tH += label.getPreferredSize().height;
 	}
 
-	private void HidePopUpWindow(){
+	private void HidePopUpWindow() {
 		autoSuggestionPopUpWindow.setSize(tW, tH);
 		autoSuggestionPopUpWindow.setVisible(false);
 		autoSuggestionPopUpWindow.revalidate();
 		autoSuggestionPopUpWindow.repaint();
 	}
+
 	private void showPopUpWindow() {
 		autoSuggestionPopUpWindow.getContentPane().add(suggestionsPanel);
 		autoSuggestionPopUpWindow.setMinimumSize(new Dimension(textField.getWidth(), 30));

@@ -93,7 +93,7 @@ public class PivotalTrie extends Trie {
 		}
 	}
 
-	public List<Integer> getRecordsIDs(Map<BasicTrieNode, PivotalActiveNode> nodes, int k) {
+	public List<Integer> getRecordsIDs(Map<BasicTrieNode, PivotalActiveNode> nodes) {
 		List<PivotalActiveNode> sorted_nodes = new Vector<>();
 		sorted_nodes.addAll(nodes.values());
 
@@ -111,13 +111,12 @@ public class PivotalTrie extends Trie {
 					recordsofsim = inverted_list.get(s);
 					for (int r : recordsofsim) {
 						if (!sim.contains(r)){
-							sim.add(r);
-							
+							sim.add(r);							
 						}
 					}
 					
-					if (sim.size() > k)
-						return sim;	
+//					if (sim.size() > k)
+//						return sim;	
 				}
 
 			}
