@@ -79,8 +79,15 @@ public class Matcher {
 		}
 
 		activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
-		cur_invList = trie.getRecordsIDs(activenodes);
-		//
+		RecordIterator r=new RecordIterator(trie,activenodes);
+		//cur_invList = trie.getRecordsIDs(activenodes);
+		for(int i=0;i<100;i++){
+			int n=r.next();
+			if(n!=-1){
+			System.out.println ("*"+n+" *"+trie.forward.get(n));
+			cur_invList.add(n);
+			}
+		}
 		List<Integer> intersection = Utils.intersectList(cur_invList, prev_invList);
 
 		if (Utils.verbose1) {
