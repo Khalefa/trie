@@ -69,7 +69,7 @@ public class Test {
 
 		String[] filename = { "icd10cm edited.txt", "test.txt", "words.txt", "test2.txt" };
 		String file = "c:\\data\\Edit\\" + filename[1];
-	 t = new PivotalTrie(file);
+		t = new PivotalTrie(file);
 
 		 Serilaize(file);
 		 t=null;

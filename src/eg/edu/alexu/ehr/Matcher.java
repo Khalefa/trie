@@ -15,7 +15,7 @@ public class Matcher {
 
 	private String typedWord;
 	private String previousWord = "";
-	private List<Integer> prev_invList = null;
+	private List<Integer> prev_invList = null;//should be replaced with cursor
 
 	private List<Integer> word_invList = null;
 	private Map<BasicTrieNode, PivotalActiveNode> activenodes = null;
@@ -80,6 +80,7 @@ public class Matcher {
 
 		activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
 		cur_invList = trie.getRecordsIDs(activenodes);
+		//
 		List<Integer> intersection = Utils.intersectList(cur_invList, prev_invList);
 
 		if (Utils.verbose1) {
