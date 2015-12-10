@@ -79,15 +79,30 @@ public class Matcher {
 		}
 
 		activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
+		List<RecordIterator> Lr=new Vector<>();
+		
 		RecordIterator r=new RecordIterator(trie,activenodes);
-		//cur_invList = trie.getRecordsIDs(activenodes);
-		for(int i=0;i<100;i++){
-			int n=r.next();
+	//	if(word_cnt>previous_word_cnt){
+		Lr.add(r);
+		ResultIterator s=new ResultIterator(Lr);
+		for(int i=0;s.hasNext();i++){
+			int n=s.next();
 			if(n!=-1){
 			System.out.println ("*"+n+" *"+trie.forward.get(n));
 			cur_invList.add(n);
 			}
 		}
+		//}
+		/*
+		//cur_invList = trie.getRecordsIDs(activenodes);
+		for(int i=0;r.hasNext();i++){
+			int n=r.next();
+			if(n!=-1){
+			//System.out.println ("*"+n+" *"+trie.forward.get(n));
+			cur_invList.add(n);
+			}
+		}
+		*/		
 		List<Integer> intersection = Utils.intersectList(cur_invList, prev_invList);
 
 		if (Utils.verbose1) {
