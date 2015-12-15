@@ -82,37 +82,17 @@ public class Matcher {
 		List<RecordIterator> Lr=new Vector<>();
 		
 		RecordIterator r=new RecordIterator(trie,activenodes);
-	//	if(word_cnt>previous_word_cnt){
 		Lr.add(r);
 		ResultIterator s=new ResultIterator(Lr);
-		for(int i=0;s.hasNext();i++){
+		for(int i=0;s.hasNext() && i<k;i++){
 			int n=s.next();
 			if(n!=-1){
-			System.out.println ("*"+n+" *"+trie.forward.get(n));
+		//	System.out.println ("*"+n+" *"+trie.forward.get(n));
 			cur_invList.add(n);
 			}
 		}
-		//}
-		/*
-		//cur_invList = trie.getRecordsIDs(activenodes);
-		for(int i=0;r.hasNext();i++){
-			int n=r.next();
-			if(n!=-1){
-			//System.out.println ("*"+n+" *"+trie.forward.get(n));
-			cur_invList.add(n);
-			}
-		}
-		*/		
-		List<Integer> intersection = Utils.intersectList(cur_invList, prev_invList);
-
-		if (Utils.verbose1) {
-			int t = -1;
-			if (prev_invList != null)
-				t = prev_invList.size();
-			System.out.println(queryString + " " + cur_invList.size() + "::::" + t + ">>>>" + intersection.size());
-		}
-		word_invList = intersection;
-		return intersection;
+		return cur_invList;
+		
 	}
 
 	List<String> getRecordsString(List<Integer> ids) {

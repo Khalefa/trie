@@ -68,10 +68,10 @@ public class Test {
 	public static void main(String[] args) {
 
 		String[] filename = { "icd10cm edited.txt", "test.txt", "words.txt", "test2.txt" };
-		String file = "c:\\data\\Edit\\" + filename[1];
-		t = new PivotalTrie(file);
+		String file = "c:\\data\\Edit\\" + filename[0];
+		//t = new PivotalTrie(file);
 
-		 Serilaize(file);
+		// Serilaize(file);
 		 t=null;
 		Desrialize(file + ".ser");
 		SwingUtilities.invokeLater(new Runnable() {
