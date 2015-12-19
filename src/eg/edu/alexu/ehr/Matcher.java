@@ -6,16 +6,20 @@ import java.util.Map;
 import java.util.Vector;
 
 public class Matcher {
+
 	final int tau = 2;
 	final int k = 10;
 
+	ResultIterator s;
+
 	public Matcher(PivotalTrie t) {
 		trie = t;
+		s = new ResultIterator();
 	}
 
 	private String typedWord;
 	private String previousWord = "";
-	private List<Integer> prev_invList = null;//should be replaced with cursor
+	private List<Integer> prev_invList = null;// should be replaced with cursor
 
 	private List<Integer> word_invList = null;
 	private Map<BasicTrieNode, PivotalActiveNode> activenodes = null;
@@ -23,11 +27,20 @@ public class Matcher {
 
 	HashMap<Integer, List<Integer>> diffList = new HashMap<>();
 
+	private int wrd_cnt(String queryString) {
+		queryString = queryString.trim();
+		if (queryString.length() == 0)
+			return 0;
+		else
+			return queryString.split(" ").length;
+
+	}
+
 	List<Integer> deletion(String queryString, String previousQueryString) {
 
 		List<Integer> cur_invList = new Vector<>();
-		int word_cnt = queryString.split(" ").length;
-		int previous_word_cnt = previousQueryString.split(" ").length;
+		int word_cnt = wrd_cnt(queryString);
+		int previous_word_cnt = wrd_cnt(previousQueryString);
 		if (word_cnt == 0)
 			return cur_invList;
 
@@ -70,34 +83,38 @@ public class Matcher {
 		String prefix = Utils.getLastPrefix(queryString);
 		String old_prefix = Utils.getLastPrefix(previousQueryString);
 
-		int word_cnt = queryString.split(" ").length;
-		int previous_word_cnt = previousQueryString.split(" ").length;
+		int word_cnt = wrd_cnt(queryString);
+		int previous_word_cnt = wrd_cnt(previousQueryString);
 
+		boolean newword = false;
 		if (word_cnt > previous_word_cnt) {
 			diffList.put(previous_word_cnt, Utils.diffList(word_invList, prev_invList));
 			prev_invList = word_invList;
+			newword = true;
 		}
 
 		activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
-		List<RecordIterator> Lr=new Vector<>();
-		
-		RecordIterator r=new RecordIterator(trie,activenodes);
-		Lr.add(r);
-		ResultIterator s=new ResultIterator(Lr);
-		for(int i=0;s.hasNext() && i<k;i++){
-			int n=s.next();
-			if(n!=-1){
-		//	System.out.println ("*"+n+" *"+trie.forward.get(n));
-			cur_invList.add(n);
-			}
+		RecordIterator r = new RecordIterator(trie, activenodes);
+
+		if (newword) {
+			s.addRecordIterator(r);
+		} else {
+			s.replaceRecordIterator(r);
+		}
+		for (int i = 0; s.hasNext() && i < k; i++) {
+			Integer n = s.next();
+			if (n != null){
+				 System.out.println ("*"+n+" *"+trie.forward.get(n));
+				cur_invList.add(n);
+			} 
 		}
 		return cur_invList;
-		
+
 	}
 
 	List<String> getRecordsString(List<Integer> ids) {
 		List<String> records = new Vector<>();
-		for (int r : ids) {		
+		for (int r : ids) {
 			records.add(trie.forward.get(r));
 		}
 		return records;
