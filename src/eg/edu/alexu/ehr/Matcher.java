@@ -1,8 +1,10 @@
 package eg.edu.alexu.ehr;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 public class Matcher {
@@ -10,22 +12,18 @@ public class Matcher {
 	final int tau = 2;
 	final int k = 10;
 
-	ResultIterator s;
+	ResultIterator res;
 
 	public Matcher(PivotalTrie t) {
 		trie = t;
-		s = new ResultIterator();
+		res = new ResultIterator();
 	}
 
 	private String typedWord;
 	private String previousWord = "";
-	private List<Integer> prev_invList = null;// should be replaced with cursor
 
-	private List<Integer> word_invList = null;
 	private Map<BasicTrieNode, PivotalActiveNode> activenodes = null;
 	private PivotalTrie trie;
-
-	HashMap<Integer, List<Integer>> diffList = new HashMap<>();
 
 	private int wrd_cnt(String queryString) {
 		queryString = queryString.trim();
@@ -36,50 +34,28 @@ public class Matcher {
 
 	}
 
-	List<Integer> deletion(String queryString, String previousQueryString) {
+	void deletion(String queryString, String previousQueryString) {
 
-		List<Integer> cur_invList = new Vector<>();
 		int word_cnt = wrd_cnt(queryString);
 		int previous_word_cnt = wrd_cnt(previousQueryString);
-		if (word_cnt == 0)
-			return cur_invList;
 
 		if (word_cnt == previous_word_cnt) {
 			String prefix = Utils.getLastPrefix(queryString);
 			String old_prefix = Utils.getLastPrefix(previousQueryString);
-
+			activenodes = new HashMap<>();
 			activenodes = trie.matchPrefixInc(prefix, old_prefix, activenodes, tau);
-			List<Integer> candidatesrecords = trie.getRecordsIDs(activenodes);
-			cur_invList = Utils.intersectList(candidatesrecords, prev_invList);
-			word_invList = cur_invList;
-			if (Utils.verbose1)
-				System.out.println("back to " + word_invList);
-			return word_invList;
-
+			RecordIterator r = new RecordIterator(trie, activenodes);
+			res.replaceRecordIterator(r);
 		} else if (word_cnt < previous_word_cnt) {
-			List<Integer> restored = new Vector<>();
 			for (int i = word_cnt; i < previous_word_cnt; i++) {
-				restored.addAll(diffList.get(i));
+				res.remove(i);
 			}
-			word_invList = prev_invList;
-			if (word_cnt == 1)
-				prev_invList = null;
-			else
-				prev_invList = Utils.UnionList(prev_invList, restored);
+			res.resetAll();
+		}
 
-			if (Utils.verbose1) {
-				System.out.println("restored  to " + restored);
-				System.out.println("	prev_invList  to " + prev_invList);
-
-			}
-			return word_invList;
-		} else
-			return null;
 	}
 
-	List<Integer> incremental(String queryString, String previousQueryString) {
-		List<Integer> cur_invList = new Vector<>();
-
+	void incremental(String queryString, String previousQueryString) {
 		String prefix = Utils.getLastPrefix(queryString);
 		String old_prefix = Utils.getLastPrefix(previousQueryString);
 
@@ -88,8 +64,6 @@ public class Matcher {
 
 		boolean newword = false;
 		if (word_cnt > previous_word_cnt) {
-			diffList.put(previous_word_cnt, Utils.diffList(word_invList, prev_invList));
-			prev_invList = word_invList;
 			newword = true;
 		}
 
@@ -97,19 +71,21 @@ public class Matcher {
 		RecordIterator r = new RecordIterator(trie, activenodes);
 
 		if (newword) {
-			s.addRecordIterator(r);
+			res.addRecordIterator(r);
 		} else {
-			s.replaceRecordIterator(r);
+			res.replaceRecordIterator(r);
 		}
-		for (int i = 0; s.hasNext() && i < k; i++) {
-			Integer n = s.next();
-			if (n != null){
-				 System.out.println ("*"+n+" *"+trie.forward.get(n));
-				cur_invList.add(n);
-			} 
-		}
-		return cur_invList;
+	}
 
+	void buildfromscratch(String queryString) {
+		int wrd_cnt = wrd_cnt(queryString);
+		String[] word = queryString.split(" ");
+		res = new ResultIterator();
+		for (int i = 0; i < wrd_cnt; i++) {
+			activenodes = trie.matchPrefix(word[i], tau);
+			RecordIterator r = new RecordIterator(trie, activenodes);
+			res.addRecordIterator(r);
+		}
 	}
 
 	List<String> getRecordsString(List<Integer> ids) {
@@ -121,31 +97,36 @@ public class Matcher {
 	}
 
 	public List<String> getCandidate(String s) {
-
 		typedWord = Utils.normalize(s.trim());
 
 		if (typedWord.equals(previousWord))
 			return null;
 
+		if (typedWord.equals(""))
+			return null;
+
 		List<Integer> candidaterecords = new Vector<>();
 
-		if (Utils.verbose)
-			System.out.print("Typed word:" + typedWord + "\n");
-		if (Utils.verbose)
-			System.out.print("Previous word:" + previousWord + "\n");
-
 		if (typedWord.startsWith(previousWord) && !typedWord.equals(previousWord)) {
-
-			candidaterecords = incremental(typedWord, previousWord);
-
+			incremental(typedWord, previousWord);
 		} else if (previousWord.startsWith(typedWord)) {
-
-			candidaterecords = deletion(typedWord, previousWord);
+			deletion(typedWord, previousWord);
+		} else {
+			// need to rebuild all
+			buildfromscratch(typedWord);
 		}
-		if (Utils.verbose)
-			System.out.println("Candidaten" + candidaterecords);
-		if (Utils.verbose2)
-			System.out.println(typedWord + "\t" + candidaterecords.size() + "\t" + candidaterecords);
+		Set<Integer> lookup = new HashSet<>();
+
+		for (int i = 0; res.hasNext() && i < k; i++) {
+			Integer n = res.next();
+			if (n != null) {
+				if (!lookup.contains(n)) {
+					lookup.add(n);
+					candidaterecords.add(n);
+				}
+			}
+		}
+
 		previousWord = typedWord;
 		List<String> ret = new Vector<>();
 		List<String> candidateRecordString = getRecordsString(candidaterecords);

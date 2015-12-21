@@ -1,7 +1,6 @@
 package eg.edu.alexu.ehr;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,10 @@ public class RecordIterator implements Iterator<Integer> {
 		sorted_nodes = new Vector<>();
 		sorted_nodes.addAll(trienodes.values());
 		Collections.sort(sorted_nodes);
+		initalize();
+	}
+
+	private void initalize() {
 		if (sorted_nodes == null || sorted_nodes.size() == 0) {
 			active_it = max_active_it = -1;
 			range_it = max_range_it = -1;
@@ -95,4 +98,12 @@ public class RecordIterator implements Iterator<Integer> {
 		return ret;
 	}
 
+	@Override
+	public String toString() {
+		return "[" + active_it + " " + max_active_it + "]";
+	}
+
+	public void reset() {
+		initalize();
+	}
 }

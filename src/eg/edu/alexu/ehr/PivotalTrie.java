@@ -77,6 +77,7 @@ public class PivotalTrie extends Trie {
 
 	public Map<BasicTrieNode, PivotalActiveNode> matchPrefixInc(String newquery, String previousquery,
 			Map<BasicTrieNode, PivotalActiveNode> pactivenodes, int tau) {
+		
 		if ((newquery.length() > 1) && (previousquery.equals(newquery.substring(0, newquery.length() - 1)))) {
 			return ICPAN(newquery, pactivenodes, tau);
 		} else {
@@ -114,9 +115,6 @@ public class PivotalTrie extends Trie {
 							sim.add(r);							
 						}
 					}
-					
-//					if (sim.size() > k)
-//						return sim;	
 				}
 
 			}
