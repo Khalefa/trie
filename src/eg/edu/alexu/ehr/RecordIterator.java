@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
-public class RecordIterator implements Iterator<Integer> {
+public class RecordIterator implements Iterator<Pair> {
 	private PivotalTrie trie;
 	// set of active nodes
 	List<PivotalActiveNode> sorted_nodes = null;
@@ -90,12 +90,16 @@ public class RecordIterator implements Iterator<Integer> {
 	}
 
 	@Override
-	public Integer next() {
+	public Pair next() {
 		if (!hasNext())
 			throw new NoSuchElementException();
 		Integer ret = keyword_records.get(record_it);
+		float n = (sorted_nodes.get(active_it).tau());
 		advance();
-		return ret;
+		Pair p = new Pair();
+		p.id = ret;
+		p.n=n;
+		return p;
 	}
 
 	@Override

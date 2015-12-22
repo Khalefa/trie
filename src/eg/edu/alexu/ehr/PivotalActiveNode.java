@@ -10,6 +10,9 @@ public class PivotalActiveNode implements Comparable<PivotalActiveNode> {
 			node = r;
 		}
 
+		int tau(){
+			return tau_pi;
+		}
 		@Override
 		public String toString() {
 			return "(" + node.id + "," + tau_px + "," + pi + "," + tau_pi + ")";

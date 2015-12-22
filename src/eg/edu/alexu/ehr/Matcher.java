@@ -1,5 +1,8 @@
 package eg.edu.alexu.ehr;
 
+import java.security.cert.CollectionCertStoreParameters;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -88,10 +91,10 @@ public class Matcher {
 		}
 	}
 
-	List<String> getRecordsString(List<Integer> ids) {
+	List<String> getRecordsString(List<Pair> ids) {
 		List<String> records = new Vector<>();
-		for (int r : ids) {
-			records.add(trie.forward.get(r));
+		for (Pair r : ids) {
+			records.add(trie.forward.get(r.id));
 		}
 		return records;
 	}
@@ -105,7 +108,7 @@ public class Matcher {
 		if (typedWord.equals(""))
 			return null;
 
-		List<Integer> candidaterecords = new Vector<>();
+		List<Pair> candidaterecords = new Vector<>();
 
 		if (typedWord.startsWith(previousWord) && !typedWord.equals(previousWord)) {
 			incremental(typedWord, previousWord);
@@ -118,10 +121,10 @@ public class Matcher {
 		Set<Integer> lookup = new HashSet<>();
 
 		for (int i = 0; res.hasNext() && i < k; i++) {
-			Integer n = res.next();
+			Pair n = res.next();
 			if (n != null) {
-				if (!lookup.contains(n)) {
-					lookup.add(n);
+				if (!lookup.contains(n.id)) {
+					lookup.add(n.id);
 					candidaterecords.add(n);
 				}
 			}
@@ -129,6 +132,7 @@ public class Matcher {
 
 		previousWord = typedWord;
 		List<String> ret = new Vector<>();
+		Collections.sort(candidaterecords);
 		List<String> candidateRecordString = getRecordsString(candidaterecords);
 		int l = 0;
 		for (String word : candidateRecordString) {

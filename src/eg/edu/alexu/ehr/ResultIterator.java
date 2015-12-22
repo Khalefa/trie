@@ -1,12 +1,20 @@
 package eg.edu.alexu.ehr;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-public class ResultIterator implements Iterator<Integer> {
+public class ResultIterator implements Iterator<Pair> {
+	int R_it;
+	List<RecordIterator> records_it = null;
+	List<Map<Integer,Pair>> retrievals = new Vector<>();
+	int max_records_it;
+
+
+	
 	public ResultIterator() {
 		records_it = new Vector<>();
 		max_records_it = 0;
@@ -21,7 +29,7 @@ public class ResultIterator implements Iterator<Integer> {
 	public void addRecordIterator(RecordIterator r) {
 		records_it.add(r);
 		max_records_it = records_it.size();
-		retrievals.add(new HashSet<>());
+		retrievals.add(new HashMap<>());
 	}
 	public void remove(int l){
 		records_it.remove(l);
@@ -31,12 +39,7 @@ public class ResultIterator implements Iterator<Integer> {
 	}
 	
 
-	int R_it;
-	List<RecordIterator> records_it = null;
-	List<Set<Integer>> retrievals = new Vector<>();
-	int max_records_it;
-
-	@Override
+		@Override
 	public boolean hasNext() {
 		for (RecordIterator t : records_it) {
 			if (t.hasNext())
@@ -45,40 +48,44 @@ public class ResultIterator implements Iterator<Integer> {
 		return false;
 	}
 
-	Integer advance() {
+	Pair advance() {
 		int r_it = R_it;
 		R_it = (R_it + 1) % max_records_it;
 		RecordIterator R = records_it.get(r_it);
 		if (R.hasNext()) {
-			int record = R.next();
-			Set<Integer> Rs = retrievals.get(r_it);
-			Rs.add(record);
+			Pair record = R.next();
+			Map<Integer,Pair> Rs = retrievals.get(r_it);
+			Rs.put(record.id,record);
 			retrievals.set(r_it, Rs);
 			return record;
 		} else
 			return null;
 	}
 
-	public Integer getTuple() {
+	public Pair getTuple() {
 		while (hasNext()) {
-			Integer record = advance();
+			Pair record = advance();
 			if (record == null)
 				continue;
 			int i = 0;
-			for (Set<?> s : retrievals) {
-				if (s.contains(record))
+			float weight=record.n;
+			for (Map<?,?> s : retrievals) {
+				if (s.containsKey(record.id)){
+					Pair t=(Pair)(s.get(record.id));
+					weight+=t.n;
 					i++;
+				}
 				else
 					break;
 			}
 			if (i == retrievals.size())
-				return record;
+				return new Pair(record.id, weight);
 		}
 		return null;
 	}
 
 	@Override
-	public Integer next() {
+	public Pair next() {
 		if (!hasNext())
 			return null;
 		else
@@ -87,7 +94,7 @@ public class ResultIterator implements Iterator<Integer> {
 
 	public void replaceRecordIterator(int place, RecordIterator r) {
 		records_it.set(place, r);
-		retrievals.set(place, new HashSet<>());
+		retrievals.set(place, new HashMap<>());
 		R_it=place;
 	}
 
