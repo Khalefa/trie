@@ -164,10 +164,14 @@ class AutoSuggestor {
 	private void checkForAndShowSuggestions() {
 
 		List<String> candidateRecordString = m.getCandidate(textField.getText());
-		if(candidateRecordString==null)return;
 		suggestionsPanel.removeAll();
-			tW = 0;
-tH = 0;
+
+		if (candidateRecordString == null) {
+
+			return;
+		}
+		tW = 0;
+		tH = 0;
 
 		if (candidateRecordString.size() == 0) {
 			if (autoSuggestionPopUpWindow.isVisible()) {

@@ -1,7 +1,5 @@
 package eg.edu.alexu.ehr;
 
-import java.security.cert.CollectionCertStoreParameters;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +11,7 @@ import java.util.Vector;
 public class Matcher {
 
 	final int tau = 2;
-	final int k = 10;
+	final int k = 20;
 
 	ResultIterator res;
 
@@ -94,7 +92,7 @@ public class Matcher {
 	List<String> getRecordsString(List<Pair> ids) {
 		List<String> records = new Vector<>();
 		for (Pair r : ids) {
-			records.add(trie.forward.get(r.id));
+			records.add(r.id+" "+trie.forward.get(r.id)+ " "+r.n);
 		}
 		return records;
 	}
